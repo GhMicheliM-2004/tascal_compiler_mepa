@@ -1,0 +1,1765 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> programa
+Rule 1     programa -> PROGRAM ID PV bloco PF
+Rule 2     bloco -> declaracoes comando_composto
+Rule 3     declaracoes -> VAR declaracao_variaveis
+Rule 4     declaracoes -> empty
+Rule 5     declaracao_variaveis -> lista_id DP tipo PV declaracao_variaveis
+Rule 6     declaracao_variaveis -> lista_id DP tipo PV
+Rule 7     lista_id -> ID
+Rule 8     lista_id -> ID VIRG lista_id
+Rule 9     tipo -> INTEGER
+Rule 10    tipo -> BOOLEAN
+Rule 11    comando_composto -> BEGIN lista_comandos END
+Rule 12    lista_comandos -> comando
+Rule 13    lista_comandos -> comando PV lista_comandos
+Rule 14    lista_comandos -> comando PV
+Rule 15    comando -> atribuicao
+Rule 16    comando -> comando_condicional
+Rule 17    comando -> comando_enquanto
+Rule 18    comando -> comando_leitura
+Rule 19    comando -> comando_escrita
+Rule 20    comando -> comando_composto
+Rule 21    comando -> empty
+Rule 22    atribuicao -> ID DPIGUAL expressao
+Rule 23    comando_condicional -> IF expressao THEN comando
+Rule 24    comando_condicional -> IF expressao THEN comando ELSE comando
+Rule 25    comando_enquanto -> WHILE expressao DO comando
+Rule 26    comando_leitura -> READ EPAR lista_id DPAR
+Rule 27    comando_escrita -> WRITE EPAR lista_expressoes DPAR
+Rule 28    lista_expressoes -> expressao
+Rule 29    lista_expressoes -> expressao VIRG lista_expressoes
+Rule 30    expressao -> expressao OR expressao_and
+Rule 31    expressao -> expressao_and
+Rule 32    expressao_and -> expressao_and AND expressao_rel
+Rule 33    expressao_and -> expressao_rel
+Rule 34    expressao_rel -> soma relacao soma
+Rule 35    expressao_rel -> soma
+Rule 36    soma -> soma MAIS termo
+Rule 37    soma -> soma MENOS termo
+Rule 38    soma -> termo
+Rule 39    termo -> termo VEZES fator
+Rule 40    termo -> termo DIV fator
+Rule 41    termo -> fator
+Rule 42    fator -> ID
+Rule 43    fator -> NUMERO
+Rule 44    fator -> TRUE
+Rule 45    fator -> FALSE
+Rule 46    fator -> EPAR expressao DPAR
+Rule 47    fator -> NOT fator
+Rule 48    fator -> MENOS fator
+Rule 49    relacao -> IGUAL
+Rule 50    relacao -> DIFERENTE
+Rule 51    relacao -> MENORQUE
+Rule 52    relacao -> MENORIGUAL
+Rule 53    relacao -> MAIORQUE
+Rule 54    relacao -> MAIORIGUAL
+Rule 55    empty -> <empty>
+
+Terminals, with rules where they appear
+
+AND                  : 32
+BEGIN                : 11
+BOOLEAN              : 10
+DIFERENTE            : 50
+DIV                  : 40
+DO                   : 25
+DP                   : 5 6
+DPAR                 : 26 27 46
+DPIGUAL              : 22
+ELSE                 : 24
+END                  : 11
+EPAR                 : 26 27 46
+FALSE                : 45
+ID                   : 1 7 8 22 42
+IF                   : 23 24
+IGUAL                : 49
+INTEGER              : 9
+MAIORIGUAL           : 54
+MAIORQUE             : 53
+MAIS                 : 36
+MENORIGUAL           : 52
+MENORQUE             : 51
+MENOS                : 37 48
+NOT                  : 47
+NUMERO               : 43
+OR                   : 30
+PF                   : 1
+PROGRAM              : 1
+PV                   : 1 5 6 13 14
+READ                 : 26
+THEN                 : 23 24
+TRUE                 : 44
+VAR                  : 3
+VEZES                : 39
+VIRG                 : 8 29
+WHILE                : 25
+WRITE                : 27
+error                : 
+
+Nonterminals, with rules where they appear
+
+atribuicao           : 15
+bloco                : 1
+comando              : 12 13 14 23 24 24 25
+comando_composto     : 2 20
+comando_condicional  : 16
+comando_enquanto     : 17
+comando_escrita      : 19
+comando_leitura      : 18
+declaracao_variaveis : 3 5
+declaracoes          : 2
+empty                : 4 21
+expressao            : 22 23 24 25 28 29 30 46
+expressao_and        : 30 31 32
+expressao_rel        : 32 33
+fator                : 39 40 41 47 48
+lista_comandos       : 11 13
+lista_expressoes     : 27 29
+lista_id             : 5 6 8 26
+programa             : 0
+relacao              : 34
+soma                 : 34 34 35 36 37
+termo                : 36 37 38 39 40
+tipo                 : 5 6
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . programa
+    (1) programa -> . PROGRAM ID PV bloco PF
+
+    PROGRAM         shift and go to state 2
+
+    programa                       shift and go to state 1
+
+state 1
+
+    (0) S' -> programa .
+
+
+
+state 2
+
+    (1) programa -> PROGRAM . ID PV bloco PF
+
+    ID              shift and go to state 3
+
+
+state 3
+
+    (1) programa -> PROGRAM ID . PV bloco PF
+
+    PV              shift and go to state 4
+
+
+state 4
+
+    (1) programa -> PROGRAM ID PV . bloco PF
+    (2) bloco -> . declaracoes comando_composto
+    (3) declaracoes -> . VAR declaracao_variaveis
+    (4) declaracoes -> . empty
+    (55) empty -> .
+
+    VAR             shift and go to state 7
+    BEGIN           reduce using rule 55 (empty -> .)
+
+    bloco                          shift and go to state 5
+    declaracoes                    shift and go to state 6
+    empty                          shift and go to state 8
+
+state 5
+
+    (1) programa -> PROGRAM ID PV bloco . PF
+
+    PF              shift and go to state 9
+
+
+state 6
+
+    (2) bloco -> declaracoes . comando_composto
+    (11) comando_composto -> . BEGIN lista_comandos END
+
+    BEGIN           shift and go to state 11
+
+    comando_composto               shift and go to state 10
+
+state 7
+
+    (3) declaracoes -> VAR . declaracao_variaveis
+    (5) declaracao_variaveis -> . lista_id DP tipo PV declaracao_variaveis
+    (6) declaracao_variaveis -> . lista_id DP tipo PV
+    (7) lista_id -> . ID
+    (8) lista_id -> . ID VIRG lista_id
+
+    ID              shift and go to state 14
+
+    declaracao_variaveis           shift and go to state 12
+    lista_id                       shift and go to state 13
+
+state 8
+
+    (4) declaracoes -> empty .
+
+    BEGIN           reduce using rule 4 (declaracoes -> empty .)
+
+
+state 9
+
+    (1) programa -> PROGRAM ID PV bloco PF .
+
+    $end            reduce using rule 1 (programa -> PROGRAM ID PV bloco PF .)
+
+
+state 10
+
+    (2) bloco -> declaracoes comando_composto .
+
+    PF              reduce using rule 2 (bloco -> declaracoes comando_composto .)
+
+
+state 11
+
+    (11) comando_composto -> BEGIN . lista_comandos END
+    (12) lista_comandos -> . comando
+    (13) lista_comandos -> . comando PV lista_comandos
+    (14) lista_comandos -> . comando PV
+    (15) comando -> . atribuicao
+    (16) comando -> . comando_condicional
+    (17) comando -> . comando_enquanto
+    (18) comando -> . comando_leitura
+    (19) comando -> . comando_escrita
+    (20) comando -> . comando_composto
+    (21) comando -> . empty
+    (22) atribuicao -> . ID DPIGUAL expressao
+    (23) comando_condicional -> . IF expressao THEN comando
+    (24) comando_condicional -> . IF expressao THEN comando ELSE comando
+    (25) comando_enquanto -> . WHILE expressao DO comando
+    (26) comando_leitura -> . READ EPAR lista_id DPAR
+    (27) comando_escrita -> . WRITE EPAR lista_expressoes DPAR
+    (11) comando_composto -> . BEGIN lista_comandos END
+    (55) empty -> .
+
+    ID              shift and go to state 24
+    IF              shift and go to state 25
+    WHILE           shift and go to state 26
+    READ            shift and go to state 27
+    WRITE           shift and go to state 28
+    BEGIN           shift and go to state 11
+    PV              reduce using rule 55 (empty -> .)
+    END             reduce using rule 55 (empty -> .)
+
+    lista_comandos                 shift and go to state 15
+    comando                        shift and go to state 16
+    atribuicao                     shift and go to state 17
+    comando_condicional            shift and go to state 18
+    comando_enquanto               shift and go to state 19
+    comando_leitura                shift and go to state 20
+    comando_escrita                shift and go to state 21
+    comando_composto               shift and go to state 22
+    empty                          shift and go to state 23
+
+state 12
+
+    (3) declaracoes -> VAR declaracao_variaveis .
+
+    BEGIN           reduce using rule 3 (declaracoes -> VAR declaracao_variaveis .)
+
+
+state 13
+
+    (5) declaracao_variaveis -> lista_id . DP tipo PV declaracao_variaveis
+    (6) declaracao_variaveis -> lista_id . DP tipo PV
+
+    DP              shift and go to state 29
+
+
+state 14
+
+    (7) lista_id -> ID .
+    (8) lista_id -> ID . VIRG lista_id
+
+    DP              reduce using rule 7 (lista_id -> ID .)
+    DPAR            reduce using rule 7 (lista_id -> ID .)
+    VIRG            shift and go to state 30
+
+
+state 15
+
+    (11) comando_composto -> BEGIN lista_comandos . END
+
+    END             shift and go to state 31
+
+
+state 16
+
+    (12) lista_comandos -> comando .
+    (13) lista_comandos -> comando . PV lista_comandos
+    (14) lista_comandos -> comando . PV
+
+    END             reduce using rule 12 (lista_comandos -> comando .)
+    PV              shift and go to state 32
+
+
+state 17
+
+    (15) comando -> atribuicao .
+
+    PV              reduce using rule 15 (comando -> atribuicao .)
+    END             reduce using rule 15 (comando -> atribuicao .)
+    ELSE            reduce using rule 15 (comando -> atribuicao .)
+
+
+state 18
+
+    (16) comando -> comando_condicional .
+
+    PV              reduce using rule 16 (comando -> comando_condicional .)
+    END             reduce using rule 16 (comando -> comando_condicional .)
+    ELSE            reduce using rule 16 (comando -> comando_condicional .)
+
+
+state 19
+
+    (17) comando -> comando_enquanto .
+
+    PV              reduce using rule 17 (comando -> comando_enquanto .)
+    END             reduce using rule 17 (comando -> comando_enquanto .)
+    ELSE            reduce using rule 17 (comando -> comando_enquanto .)
+
+
+state 20
+
+    (18) comando -> comando_leitura .
+
+    PV              reduce using rule 18 (comando -> comando_leitura .)
+    END             reduce using rule 18 (comando -> comando_leitura .)
+    ELSE            reduce using rule 18 (comando -> comando_leitura .)
+
+
+state 21
+
+    (19) comando -> comando_escrita .
+
+    PV              reduce using rule 19 (comando -> comando_escrita .)
+    END             reduce using rule 19 (comando -> comando_escrita .)
+    ELSE            reduce using rule 19 (comando -> comando_escrita .)
+
+
+state 22
+
+    (20) comando -> comando_composto .
+
+    PV              reduce using rule 20 (comando -> comando_composto .)
+    END             reduce using rule 20 (comando -> comando_composto .)
+    ELSE            reduce using rule 20 (comando -> comando_composto .)
+
+
+state 23
+
+    (21) comando -> empty .
+
+    PV              reduce using rule 21 (comando -> empty .)
+    END             reduce using rule 21 (comando -> empty .)
+    ELSE            reduce using rule 21 (comando -> empty .)
+
+
+state 24
+
+    (22) atribuicao -> ID . DPIGUAL expressao
+
+    DPIGUAL         shift and go to state 33
+
+
+state 25
+
+    (23) comando_condicional -> IF . expressao THEN comando
+    (24) comando_condicional -> IF . expressao THEN comando ELSE comando
+    (30) expressao -> . expressao OR expressao_and
+    (31) expressao -> . expressao_and
+    (32) expressao_and -> . expressao_and AND expressao_rel
+    (33) expressao_and -> . expressao_rel
+    (34) expressao_rel -> . soma relacao soma
+    (35) expressao_rel -> . soma
+    (36) soma -> . soma MAIS termo
+    (37) soma -> . soma MENOS termo
+    (38) soma -> . termo
+    (39) termo -> . termo VEZES fator
+    (40) termo -> . termo DIV fator
+    (41) termo -> . fator
+    (42) fator -> . ID
+    (43) fator -> . NUMERO
+    (44) fator -> . TRUE
+    (45) fator -> . FALSE
+    (46) fator -> . EPAR expressao DPAR
+    (47) fator -> . NOT fator
+    (48) fator -> . MENOS fator
+
+    ID              shift and go to state 41
+    NUMERO          shift and go to state 42
+    TRUE            shift and go to state 43
+    FALSE           shift and go to state 44
+    EPAR            shift and go to state 45
+    NOT             shift and go to state 46
+    MENOS           shift and go to state 39
+
+    expressao                      shift and go to state 34
+    expressao_and                  shift and go to state 35
+    expressao_rel                  shift and go to state 36
+    soma                           shift and go to state 37
+    termo                          shift and go to state 38
+    fator                          shift and go to state 40
+
+state 26
+
+    (25) comando_enquanto -> WHILE . expressao DO comando
+    (30) expressao -> . expressao OR expressao_and
+    (31) expressao -> . expressao_and
+    (32) expressao_and -> . expressao_and AND expressao_rel
+    (33) expressao_and -> . expressao_rel
+    (34) expressao_rel -> . soma relacao soma
+    (35) expressao_rel -> . soma
+    (36) soma -> . soma MAIS termo
+    (37) soma -> . soma MENOS termo
+    (38) soma -> . termo
+    (39) termo -> . termo VEZES fator
+    (40) termo -> . termo DIV fator
+    (41) termo -> . fator
+    (42) fator -> . ID
+    (43) fator -> . NUMERO
+    (44) fator -> . TRUE
+    (45) fator -> . FALSE
+    (46) fator -> . EPAR expressao DPAR
+    (47) fator -> . NOT fator
+    (48) fator -> . MENOS fator
+
+    ID              shift and go to state 41
+    NUMERO          shift and go to state 42
+    TRUE            shift and go to state 43
+    FALSE           shift and go to state 44
+    EPAR            shift and go to state 45
+    NOT             shift and go to state 46
+    MENOS           shift and go to state 39
+
+    expressao                      shift and go to state 47
+    expressao_and                  shift and go to state 35
+    expressao_rel                  shift and go to state 36
+    soma                           shift and go to state 37
+    termo                          shift and go to state 38
+    fator                          shift and go to state 40
+
+state 27
+
+    (26) comando_leitura -> READ . EPAR lista_id DPAR
+
+    EPAR            shift and go to state 48
+
+
+state 28
+
+    (27) comando_escrita -> WRITE . EPAR lista_expressoes DPAR
+
+    EPAR            shift and go to state 49
+
+
+state 29
+
+    (5) declaracao_variaveis -> lista_id DP . tipo PV declaracao_variaveis
+    (6) declaracao_variaveis -> lista_id DP . tipo PV
+    (9) tipo -> . INTEGER
+    (10) tipo -> . BOOLEAN
+
+    INTEGER         shift and go to state 51
+    BOOLEAN         shift and go to state 52
+
+    tipo                           shift and go to state 50
+
+state 30
+
+    (8) lista_id -> ID VIRG . lista_id
+    (7) lista_id -> . ID
+    (8) lista_id -> . ID VIRG lista_id
+
+    ID              shift and go to state 14
+
+    lista_id                       shift and go to state 53
+
+state 31
+
+    (11) comando_composto -> BEGIN lista_comandos END .
+
+    PF              reduce using rule 11 (comando_composto -> BEGIN lista_comandos END .)
+    PV              reduce using rule 11 (comando_composto -> BEGIN lista_comandos END .)
+    END             reduce using rule 11 (comando_composto -> BEGIN lista_comandos END .)
+    ELSE            reduce using rule 11 (comando_composto -> BEGIN lista_comandos END .)
+
+
+state 32
+
+    (13) lista_comandos -> comando PV . lista_comandos
+    (14) lista_comandos -> comando PV .
+    (12) lista_comandos -> . comando
+    (13) lista_comandos -> . comando PV lista_comandos
+    (14) lista_comandos -> . comando PV
+    (15) comando -> . atribuicao
+    (16) comando -> . comando_condicional
+    (17) comando -> . comando_enquanto
+    (18) comando -> . comando_leitura
+    (19) comando -> . comando_escrita
+    (20) comando -> . comando_composto
+    (21) comando -> . empty
+    (22) atribuicao -> . ID DPIGUAL expressao
+    (23) comando_condicional -> . IF expressao THEN comando
+    (24) comando_condicional -> . IF expressao THEN comando ELSE comando
+    (25) comando_enquanto -> . WHILE expressao DO comando
+    (26) comando_leitura -> . READ EPAR lista_id DPAR
+    (27) comando_escrita -> . WRITE EPAR lista_expressoes DPAR
+    (11) comando_composto -> . BEGIN lista_comandos END
+    (55) empty -> .
+
+  ! reduce/reduce conflict for END resolved using rule 14 (lista_comandos -> comando PV .)
+    END             reduce using rule 14 (lista_comandos -> comando PV .)
+    ID              shift and go to state 24
+    IF              shift and go to state 25
+    WHILE           shift and go to state 26
+    READ            shift and go to state 27
+    WRITE           shift and go to state 28
+    BEGIN           shift and go to state 11
+    PV              reduce using rule 55 (empty -> .)
+
+  ! END             [ reduce using rule 55 (empty -> .) ]
+
+    comando                        shift and go to state 16
+    lista_comandos                 shift and go to state 54
+    atribuicao                     shift and go to state 17
+    comando_condicional            shift and go to state 18
+    comando_enquanto               shift and go to state 19
+    comando_leitura                shift and go to state 20
+    comando_escrita                shift and go to state 21
+    comando_composto               shift and go to state 22
+    empty                          shift and go to state 23
+
+state 33
+
+    (22) atribuicao -> ID DPIGUAL . expressao
+    (30) expressao -> . expressao OR expressao_and
+    (31) expressao -> . expressao_and
+    (32) expressao_and -> . expressao_and AND expressao_rel
+    (33) expressao_and -> . expressao_rel
+    (34) expressao_rel -> . soma relacao soma
+    (35) expressao_rel -> . soma
+    (36) soma -> . soma MAIS termo
+    (37) soma -> . soma MENOS termo
+    (38) soma -> . termo
+    (39) termo -> . termo VEZES fator
+    (40) termo -> . termo DIV fator
+    (41) termo -> . fator
+    (42) fator -> . ID
+    (43) fator -> . NUMERO
+    (44) fator -> . TRUE
+    (45) fator -> . FALSE
+    (46) fator -> . EPAR expressao DPAR
+    (47) fator -> . NOT fator
+    (48) fator -> . MENOS fator
+
+    ID              shift and go to state 41
+    NUMERO          shift and go to state 42
+    TRUE            shift and go to state 43
+    FALSE           shift and go to state 44
+    EPAR            shift and go to state 45
+    NOT             shift and go to state 46
+    MENOS           shift and go to state 39
+
+    expressao                      shift and go to state 55
+    expressao_and                  shift and go to state 35
+    expressao_rel                  shift and go to state 36
+    soma                           shift and go to state 37
+    termo                          shift and go to state 38
+    fator                          shift and go to state 40
+
+state 34
+
+    (23) comando_condicional -> IF expressao . THEN comando
+    (24) comando_condicional -> IF expressao . THEN comando ELSE comando
+    (30) expressao -> expressao . OR expressao_and
+
+    THEN            shift and go to state 56
+    OR              shift and go to state 57
+
+
+state 35
+
+    (31) expressao -> expressao_and .
+    (32) expressao_and -> expressao_and . AND expressao_rel
+
+    THEN            reduce using rule 31 (expressao -> expressao_and .)
+    OR              reduce using rule 31 (expressao -> expressao_and .)
+    DO              reduce using rule 31 (expressao -> expressao_and .)
+    PV              reduce using rule 31 (expressao -> expressao_and .)
+    END             reduce using rule 31 (expressao -> expressao_and .)
+    ELSE            reduce using rule 31 (expressao -> expressao_and .)
+    DPAR            reduce using rule 31 (expressao -> expressao_and .)
+    VIRG            reduce using rule 31 (expressao -> expressao_and .)
+    AND             shift and go to state 58
+
+
+state 36
+
+    (33) expressao_and -> expressao_rel .
+
+    AND             reduce using rule 33 (expressao_and -> expressao_rel .)
+    THEN            reduce using rule 33 (expressao_and -> expressao_rel .)
+    OR              reduce using rule 33 (expressao_and -> expressao_rel .)
+    DO              reduce using rule 33 (expressao_and -> expressao_rel .)
+    PV              reduce using rule 33 (expressao_and -> expressao_rel .)
+    END             reduce using rule 33 (expressao_and -> expressao_rel .)
+    ELSE            reduce using rule 33 (expressao_and -> expressao_rel .)
+    DPAR            reduce using rule 33 (expressao_and -> expressao_rel .)
+    VIRG            reduce using rule 33 (expressao_and -> expressao_rel .)
+
+
+state 37
+
+    (34) expressao_rel -> soma . relacao soma
+    (35) expressao_rel -> soma .
+    (36) soma -> soma . MAIS termo
+    (37) soma -> soma . MENOS termo
+    (49) relacao -> . IGUAL
+    (50) relacao -> . DIFERENTE
+    (51) relacao -> . MENORQUE
+    (52) relacao -> . MENORIGUAL
+    (53) relacao -> . MAIORQUE
+    (54) relacao -> . MAIORIGUAL
+
+    AND             reduce using rule 35 (expressao_rel -> soma .)
+    THEN            reduce using rule 35 (expressao_rel -> soma .)
+    OR              reduce using rule 35 (expressao_rel -> soma .)
+    DO              reduce using rule 35 (expressao_rel -> soma .)
+    PV              reduce using rule 35 (expressao_rel -> soma .)
+    END             reduce using rule 35 (expressao_rel -> soma .)
+    ELSE            reduce using rule 35 (expressao_rel -> soma .)
+    DPAR            reduce using rule 35 (expressao_rel -> soma .)
+    VIRG            reduce using rule 35 (expressao_rel -> soma .)
+    MAIS            shift and go to state 60
+    MENOS           shift and go to state 61
+    IGUAL           shift and go to state 62
+    DIFERENTE       shift and go to state 63
+    MENORQUE        shift and go to state 64
+    MENORIGUAL      shift and go to state 65
+    MAIORQUE        shift and go to state 66
+    MAIORIGUAL      shift and go to state 67
+
+    relacao                        shift and go to state 59
+
+state 38
+
+    (38) soma -> termo .
+    (39) termo -> termo . VEZES fator
+    (40) termo -> termo . DIV fator
+
+    MAIS            reduce using rule 38 (soma -> termo .)
+    MENOS           reduce using rule 38 (soma -> termo .)
+    IGUAL           reduce using rule 38 (soma -> termo .)
+    DIFERENTE       reduce using rule 38 (soma -> termo .)
+    MENORQUE        reduce using rule 38 (soma -> termo .)
+    MENORIGUAL      reduce using rule 38 (soma -> termo .)
+    MAIORQUE        reduce using rule 38 (soma -> termo .)
+    MAIORIGUAL      reduce using rule 38 (soma -> termo .)
+    AND             reduce using rule 38 (soma -> termo .)
+    THEN            reduce using rule 38 (soma -> termo .)
+    OR              reduce using rule 38 (soma -> termo .)
+    DO              reduce using rule 38 (soma -> termo .)
+    PV              reduce using rule 38 (soma -> termo .)
+    END             reduce using rule 38 (soma -> termo .)
+    ELSE            reduce using rule 38 (soma -> termo .)
+    DPAR            reduce using rule 38 (soma -> termo .)
+    VIRG            reduce using rule 38 (soma -> termo .)
+    VEZES           shift and go to state 68
+    DIV             shift and go to state 69
+
+
+state 39
+
+    (48) fator -> MENOS . fator
+    (42) fator -> . ID
+    (43) fator -> . NUMERO
+    (44) fator -> . TRUE
+    (45) fator -> . FALSE
+    (46) fator -> . EPAR expressao DPAR
+    (47) fator -> . NOT fator
+    (48) fator -> . MENOS fator
+
+    ID              shift and go to state 41
+    NUMERO          shift and go to state 42
+    TRUE            shift and go to state 43
+    FALSE           shift and go to state 44
+    EPAR            shift and go to state 45
+    NOT             shift and go to state 46
+    MENOS           shift and go to state 39
+
+    fator                          shift and go to state 70
+
+state 40
+
+    (41) termo -> fator .
+
+    VEZES           reduce using rule 41 (termo -> fator .)
+    DIV             reduce using rule 41 (termo -> fator .)
+    MAIS            reduce using rule 41 (termo -> fator .)
+    MENOS           reduce using rule 41 (termo -> fator .)
+    IGUAL           reduce using rule 41 (termo -> fator .)
+    DIFERENTE       reduce using rule 41 (termo -> fator .)
+    MENORQUE        reduce using rule 41 (termo -> fator .)
+    MENORIGUAL      reduce using rule 41 (termo -> fator .)
+    MAIORQUE        reduce using rule 41 (termo -> fator .)
+    MAIORIGUAL      reduce using rule 41 (termo -> fator .)
+    AND             reduce using rule 41 (termo -> fator .)
+    THEN            reduce using rule 41 (termo -> fator .)
+    OR              reduce using rule 41 (termo -> fator .)
+    DO              reduce using rule 41 (termo -> fator .)
+    PV              reduce using rule 41 (termo -> fator .)
+    END             reduce using rule 41 (termo -> fator .)
+    ELSE            reduce using rule 41 (termo -> fator .)
+    DPAR            reduce using rule 41 (termo -> fator .)
+    VIRG            reduce using rule 41 (termo -> fator .)
+
+
+state 41
+
+    (42) fator -> ID .
+
+    VEZES           reduce using rule 42 (fator -> ID .)
+    DIV             reduce using rule 42 (fator -> ID .)
+    MAIS            reduce using rule 42 (fator -> ID .)
+    MENOS           reduce using rule 42 (fator -> ID .)
+    IGUAL           reduce using rule 42 (fator -> ID .)
+    DIFERENTE       reduce using rule 42 (fator -> ID .)
+    MENORQUE        reduce using rule 42 (fator -> ID .)
+    MENORIGUAL      reduce using rule 42 (fator -> ID .)
+    MAIORQUE        reduce using rule 42 (fator -> ID .)
+    MAIORIGUAL      reduce using rule 42 (fator -> ID .)
+    AND             reduce using rule 42 (fator -> ID .)
+    THEN            reduce using rule 42 (fator -> ID .)
+    OR              reduce using rule 42 (fator -> ID .)
+    DO              reduce using rule 42 (fator -> ID .)
+    PV              reduce using rule 42 (fator -> ID .)
+    END             reduce using rule 42 (fator -> ID .)
+    ELSE            reduce using rule 42 (fator -> ID .)
+    DPAR            reduce using rule 42 (fator -> ID .)
+    VIRG            reduce using rule 42 (fator -> ID .)
+
+
+state 42
+
+    (43) fator -> NUMERO .
+
+    VEZES           reduce using rule 43 (fator -> NUMERO .)
+    DIV             reduce using rule 43 (fator -> NUMERO .)
+    MAIS            reduce using rule 43 (fator -> NUMERO .)
+    MENOS           reduce using rule 43 (fator -> NUMERO .)
+    IGUAL           reduce using rule 43 (fator -> NUMERO .)
+    DIFERENTE       reduce using rule 43 (fator -> NUMERO .)
+    MENORQUE        reduce using rule 43 (fator -> NUMERO .)
+    MENORIGUAL      reduce using rule 43 (fator -> NUMERO .)
+    MAIORQUE        reduce using rule 43 (fator -> NUMERO .)
+    MAIORIGUAL      reduce using rule 43 (fator -> NUMERO .)
+    AND             reduce using rule 43 (fator -> NUMERO .)
+    THEN            reduce using rule 43 (fator -> NUMERO .)
+    OR              reduce using rule 43 (fator -> NUMERO .)
+    DO              reduce using rule 43 (fator -> NUMERO .)
+    PV              reduce using rule 43 (fator -> NUMERO .)
+    END             reduce using rule 43 (fator -> NUMERO .)
+    ELSE            reduce using rule 43 (fator -> NUMERO .)
+    DPAR            reduce using rule 43 (fator -> NUMERO .)
+    VIRG            reduce using rule 43 (fator -> NUMERO .)
+
+
+state 43
+
+    (44) fator -> TRUE .
+
+    VEZES           reduce using rule 44 (fator -> TRUE .)
+    DIV             reduce using rule 44 (fator -> TRUE .)
+    MAIS            reduce using rule 44 (fator -> TRUE .)
+    MENOS           reduce using rule 44 (fator -> TRUE .)
+    IGUAL           reduce using rule 44 (fator -> TRUE .)
+    DIFERENTE       reduce using rule 44 (fator -> TRUE .)
+    MENORQUE        reduce using rule 44 (fator -> TRUE .)
+    MENORIGUAL      reduce using rule 44 (fator -> TRUE .)
+    MAIORQUE        reduce using rule 44 (fator -> TRUE .)
+    MAIORIGUAL      reduce using rule 44 (fator -> TRUE .)
+    AND             reduce using rule 44 (fator -> TRUE .)
+    THEN            reduce using rule 44 (fator -> TRUE .)
+    OR              reduce using rule 44 (fator -> TRUE .)
+    DO              reduce using rule 44 (fator -> TRUE .)
+    PV              reduce using rule 44 (fator -> TRUE .)
+    END             reduce using rule 44 (fator -> TRUE .)
+    ELSE            reduce using rule 44 (fator -> TRUE .)
+    DPAR            reduce using rule 44 (fator -> TRUE .)
+    VIRG            reduce using rule 44 (fator -> TRUE .)
+
+
+state 44
+
+    (45) fator -> FALSE .
+
+    VEZES           reduce using rule 45 (fator -> FALSE .)
+    DIV             reduce using rule 45 (fator -> FALSE .)
+    MAIS            reduce using rule 45 (fator -> FALSE .)
+    MENOS           reduce using rule 45 (fator -> FALSE .)
+    IGUAL           reduce using rule 45 (fator -> FALSE .)
+    DIFERENTE       reduce using rule 45 (fator -> FALSE .)
+    MENORQUE        reduce using rule 45 (fator -> FALSE .)
+    MENORIGUAL      reduce using rule 45 (fator -> FALSE .)
+    MAIORQUE        reduce using rule 45 (fator -> FALSE .)
+    MAIORIGUAL      reduce using rule 45 (fator -> FALSE .)
+    AND             reduce using rule 45 (fator -> FALSE .)
+    THEN            reduce using rule 45 (fator -> FALSE .)
+    OR              reduce using rule 45 (fator -> FALSE .)
+    DO              reduce using rule 45 (fator -> FALSE .)
+    PV              reduce using rule 45 (fator -> FALSE .)
+    END             reduce using rule 45 (fator -> FALSE .)
+    ELSE            reduce using rule 45 (fator -> FALSE .)
+    DPAR            reduce using rule 45 (fator -> FALSE .)
+    VIRG            reduce using rule 45 (fator -> FALSE .)
+
+
+state 45
+
+    (46) fator -> EPAR . expressao DPAR
+    (30) expressao -> . expressao OR expressao_and
+    (31) expressao -> . expressao_and
+    (32) expressao_and -> . expressao_and AND expressao_rel
+    (33) expressao_and -> . expressao_rel
+    (34) expressao_rel -> . soma relacao soma
+    (35) expressao_rel -> . soma
+    (36) soma -> . soma MAIS termo
+    (37) soma -> . soma MENOS termo
+    (38) soma -> . termo
+    (39) termo -> . termo VEZES fator
+    (40) termo -> . termo DIV fator
+    (41) termo -> . fator
+    (42) fator -> . ID
+    (43) fator -> . NUMERO
+    (44) fator -> . TRUE
+    (45) fator -> . FALSE
+    (46) fator -> . EPAR expressao DPAR
+    (47) fator -> . NOT fator
+    (48) fator -> . MENOS fator
+
+    ID              shift and go to state 41
+    NUMERO          shift and go to state 42
+    TRUE            shift and go to state 43
+    FALSE           shift and go to state 44
+    EPAR            shift and go to state 45
+    NOT             shift and go to state 46
+    MENOS           shift and go to state 39
+
+    expressao                      shift and go to state 71
+    expressao_and                  shift and go to state 35
+    expressao_rel                  shift and go to state 36
+    soma                           shift and go to state 37
+    termo                          shift and go to state 38
+    fator                          shift and go to state 40
+
+state 46
+
+    (47) fator -> NOT . fator
+    (42) fator -> . ID
+    (43) fator -> . NUMERO
+    (44) fator -> . TRUE
+    (45) fator -> . FALSE
+    (46) fator -> . EPAR expressao DPAR
+    (47) fator -> . NOT fator
+    (48) fator -> . MENOS fator
+
+    ID              shift and go to state 41
+    NUMERO          shift and go to state 42
+    TRUE            shift and go to state 43
+    FALSE           shift and go to state 44
+    EPAR            shift and go to state 45
+    NOT             shift and go to state 46
+    MENOS           shift and go to state 39
+
+    fator                          shift and go to state 72
+
+state 47
+
+    (25) comando_enquanto -> WHILE expressao . DO comando
+    (30) expressao -> expressao . OR expressao_and
+
+    DO              shift and go to state 73
+    OR              shift and go to state 57
+
+
+state 48
+
+    (26) comando_leitura -> READ EPAR . lista_id DPAR
+    (7) lista_id -> . ID
+    (8) lista_id -> . ID VIRG lista_id
+
+    ID              shift and go to state 14
+
+    lista_id                       shift and go to state 74
+
+state 49
+
+    (27) comando_escrita -> WRITE EPAR . lista_expressoes DPAR
+    (28) lista_expressoes -> . expressao
+    (29) lista_expressoes -> . expressao VIRG lista_expressoes
+    (30) expressao -> . expressao OR expressao_and
+    (31) expressao -> . expressao_and
+    (32) expressao_and -> . expressao_and AND expressao_rel
+    (33) expressao_and -> . expressao_rel
+    (34) expressao_rel -> . soma relacao soma
+    (35) expressao_rel -> . soma
+    (36) soma -> . soma MAIS termo
+    (37) soma -> . soma MENOS termo
+    (38) soma -> . termo
+    (39) termo -> . termo VEZES fator
+    (40) termo -> . termo DIV fator
+    (41) termo -> . fator
+    (42) fator -> . ID
+    (43) fator -> . NUMERO
+    (44) fator -> . TRUE
+    (45) fator -> . FALSE
+    (46) fator -> . EPAR expressao DPAR
+    (47) fator -> . NOT fator
+    (48) fator -> . MENOS fator
+
+    ID              shift and go to state 41
+    NUMERO          shift and go to state 42
+    TRUE            shift and go to state 43
+    FALSE           shift and go to state 44
+    EPAR            shift and go to state 45
+    NOT             shift and go to state 46
+    MENOS           shift and go to state 39
+
+    lista_expressoes               shift and go to state 75
+    expressao                      shift and go to state 76
+    expressao_and                  shift and go to state 35
+    expressao_rel                  shift and go to state 36
+    soma                           shift and go to state 37
+    termo                          shift and go to state 38
+    fator                          shift and go to state 40
+
+state 50
+
+    (5) declaracao_variaveis -> lista_id DP tipo . PV declaracao_variaveis
+    (6) declaracao_variaveis -> lista_id DP tipo . PV
+
+    PV              shift and go to state 77
+
+
+state 51
+
+    (9) tipo -> INTEGER .
+
+    PV              reduce using rule 9 (tipo -> INTEGER .)
+
+
+state 52
+
+    (10) tipo -> BOOLEAN .
+
+    PV              reduce using rule 10 (tipo -> BOOLEAN .)
+
+
+state 53
+
+    (8) lista_id -> ID VIRG lista_id .
+
+    DP              reduce using rule 8 (lista_id -> ID VIRG lista_id .)
+    DPAR            reduce using rule 8 (lista_id -> ID VIRG lista_id .)
+
+
+state 54
+
+    (13) lista_comandos -> comando PV lista_comandos .
+
+    END             reduce using rule 13 (lista_comandos -> comando PV lista_comandos .)
+
+
+state 55
+
+    (22) atribuicao -> ID DPIGUAL expressao .
+    (30) expressao -> expressao . OR expressao_and
+
+    PV              reduce using rule 22 (atribuicao -> ID DPIGUAL expressao .)
+    END             reduce using rule 22 (atribuicao -> ID DPIGUAL expressao .)
+    ELSE            reduce using rule 22 (atribuicao -> ID DPIGUAL expressao .)
+    OR              shift and go to state 57
+
+
+state 56
+
+    (23) comando_condicional -> IF expressao THEN . comando
+    (24) comando_condicional -> IF expressao THEN . comando ELSE comando
+    (15) comando -> . atribuicao
+    (16) comando -> . comando_condicional
+    (17) comando -> . comando_enquanto
+    (18) comando -> . comando_leitura
+    (19) comando -> . comando_escrita
+    (20) comando -> . comando_composto
+    (21) comando -> . empty
+    (22) atribuicao -> . ID DPIGUAL expressao
+    (23) comando_condicional -> . IF expressao THEN comando
+    (24) comando_condicional -> . IF expressao THEN comando ELSE comando
+    (25) comando_enquanto -> . WHILE expressao DO comando
+    (26) comando_leitura -> . READ EPAR lista_id DPAR
+    (27) comando_escrita -> . WRITE EPAR lista_expressoes DPAR
+    (11) comando_composto -> . BEGIN lista_comandos END
+    (55) empty -> .
+
+    ID              shift and go to state 24
+    IF              shift and go to state 25
+    WHILE           shift and go to state 26
+    READ            shift and go to state 27
+    WRITE           shift and go to state 28
+    BEGIN           shift and go to state 11
+    ELSE            reduce using rule 55 (empty -> .)
+    PV              reduce using rule 55 (empty -> .)
+    END             reduce using rule 55 (empty -> .)
+
+    comando                        shift and go to state 78
+    atribuicao                     shift and go to state 17
+    comando_condicional            shift and go to state 18
+    comando_enquanto               shift and go to state 19
+    comando_leitura                shift and go to state 20
+    comando_escrita                shift and go to state 21
+    comando_composto               shift and go to state 22
+    empty                          shift and go to state 23
+
+state 57
+
+    (30) expressao -> expressao OR . expressao_and
+    (32) expressao_and -> . expressao_and AND expressao_rel
+    (33) expressao_and -> . expressao_rel
+    (34) expressao_rel -> . soma relacao soma
+    (35) expressao_rel -> . soma
+    (36) soma -> . soma MAIS termo
+    (37) soma -> . soma MENOS termo
+    (38) soma -> . termo
+    (39) termo -> . termo VEZES fator
+    (40) termo -> . termo DIV fator
+    (41) termo -> . fator
+    (42) fator -> . ID
+    (43) fator -> . NUMERO
+    (44) fator -> . TRUE
+    (45) fator -> . FALSE
+    (46) fator -> . EPAR expressao DPAR
+    (47) fator -> . NOT fator
+    (48) fator -> . MENOS fator
+
+    ID              shift and go to state 41
+    NUMERO          shift and go to state 42
+    TRUE            shift and go to state 43
+    FALSE           shift and go to state 44
+    EPAR            shift and go to state 45
+    NOT             shift and go to state 46
+    MENOS           shift and go to state 39
+
+    expressao_and                  shift and go to state 79
+    expressao_rel                  shift and go to state 36
+    soma                           shift and go to state 37
+    termo                          shift and go to state 38
+    fator                          shift and go to state 40
+
+state 58
+
+    (32) expressao_and -> expressao_and AND . expressao_rel
+    (34) expressao_rel -> . soma relacao soma
+    (35) expressao_rel -> . soma
+    (36) soma -> . soma MAIS termo
+    (37) soma -> . soma MENOS termo
+    (38) soma -> . termo
+    (39) termo -> . termo VEZES fator
+    (40) termo -> . termo DIV fator
+    (41) termo -> . fator
+    (42) fator -> . ID
+    (43) fator -> . NUMERO
+    (44) fator -> . TRUE
+    (45) fator -> . FALSE
+    (46) fator -> . EPAR expressao DPAR
+    (47) fator -> . NOT fator
+    (48) fator -> . MENOS fator
+
+    ID              shift and go to state 41
+    NUMERO          shift and go to state 42
+    TRUE            shift and go to state 43
+    FALSE           shift and go to state 44
+    EPAR            shift and go to state 45
+    NOT             shift and go to state 46
+    MENOS           shift and go to state 39
+
+    expressao_rel                  shift and go to state 80
+    soma                           shift and go to state 37
+    termo                          shift and go to state 38
+    fator                          shift and go to state 40
+
+state 59
+
+    (34) expressao_rel -> soma relacao . soma
+    (36) soma -> . soma MAIS termo
+    (37) soma -> . soma MENOS termo
+    (38) soma -> . termo
+    (39) termo -> . termo VEZES fator
+    (40) termo -> . termo DIV fator
+    (41) termo -> . fator
+    (42) fator -> . ID
+    (43) fator -> . NUMERO
+    (44) fator -> . TRUE
+    (45) fator -> . FALSE
+    (46) fator -> . EPAR expressao DPAR
+    (47) fator -> . NOT fator
+    (48) fator -> . MENOS fator
+
+    ID              shift and go to state 41
+    NUMERO          shift and go to state 42
+    TRUE            shift and go to state 43
+    FALSE           shift and go to state 44
+    EPAR            shift and go to state 45
+    NOT             shift and go to state 46
+    MENOS           shift and go to state 39
+
+    soma                           shift and go to state 81
+    termo                          shift and go to state 38
+    fator                          shift and go to state 40
+
+state 60
+
+    (36) soma -> soma MAIS . termo
+    (39) termo -> . termo VEZES fator
+    (40) termo -> . termo DIV fator
+    (41) termo -> . fator
+    (42) fator -> . ID
+    (43) fator -> . NUMERO
+    (44) fator -> . TRUE
+    (45) fator -> . FALSE
+    (46) fator -> . EPAR expressao DPAR
+    (47) fator -> . NOT fator
+    (48) fator -> . MENOS fator
+
+    ID              shift and go to state 41
+    NUMERO          shift and go to state 42
+    TRUE            shift and go to state 43
+    FALSE           shift and go to state 44
+    EPAR            shift and go to state 45
+    NOT             shift and go to state 46
+    MENOS           shift and go to state 39
+
+    termo                          shift and go to state 82
+    fator                          shift and go to state 40
+
+state 61
+
+    (37) soma -> soma MENOS . termo
+    (39) termo -> . termo VEZES fator
+    (40) termo -> . termo DIV fator
+    (41) termo -> . fator
+    (42) fator -> . ID
+    (43) fator -> . NUMERO
+    (44) fator -> . TRUE
+    (45) fator -> . FALSE
+    (46) fator -> . EPAR expressao DPAR
+    (47) fator -> . NOT fator
+    (48) fator -> . MENOS fator
+
+    ID              shift and go to state 41
+    NUMERO          shift and go to state 42
+    TRUE            shift and go to state 43
+    FALSE           shift and go to state 44
+    EPAR            shift and go to state 45
+    NOT             shift and go to state 46
+    MENOS           shift and go to state 39
+
+    termo                          shift and go to state 83
+    fator                          shift and go to state 40
+
+state 62
+
+    (49) relacao -> IGUAL .
+
+    ID              reduce using rule 49 (relacao -> IGUAL .)
+    NUMERO          reduce using rule 49 (relacao -> IGUAL .)
+    TRUE            reduce using rule 49 (relacao -> IGUAL .)
+    FALSE           reduce using rule 49 (relacao -> IGUAL .)
+    EPAR            reduce using rule 49 (relacao -> IGUAL .)
+    NOT             reduce using rule 49 (relacao -> IGUAL .)
+    MENOS           reduce using rule 49 (relacao -> IGUAL .)
+
+
+state 63
+
+    (50) relacao -> DIFERENTE .
+
+    ID              reduce using rule 50 (relacao -> DIFERENTE .)
+    NUMERO          reduce using rule 50 (relacao -> DIFERENTE .)
+    TRUE            reduce using rule 50 (relacao -> DIFERENTE .)
+    FALSE           reduce using rule 50 (relacao -> DIFERENTE .)
+    EPAR            reduce using rule 50 (relacao -> DIFERENTE .)
+    NOT             reduce using rule 50 (relacao -> DIFERENTE .)
+    MENOS           reduce using rule 50 (relacao -> DIFERENTE .)
+
+
+state 64
+
+    (51) relacao -> MENORQUE .
+
+    ID              reduce using rule 51 (relacao -> MENORQUE .)
+    NUMERO          reduce using rule 51 (relacao -> MENORQUE .)
+    TRUE            reduce using rule 51 (relacao -> MENORQUE .)
+    FALSE           reduce using rule 51 (relacao -> MENORQUE .)
+    EPAR            reduce using rule 51 (relacao -> MENORQUE .)
+    NOT             reduce using rule 51 (relacao -> MENORQUE .)
+    MENOS           reduce using rule 51 (relacao -> MENORQUE .)
+
+
+state 65
+
+    (52) relacao -> MENORIGUAL .
+
+    ID              reduce using rule 52 (relacao -> MENORIGUAL .)
+    NUMERO          reduce using rule 52 (relacao -> MENORIGUAL .)
+    TRUE            reduce using rule 52 (relacao -> MENORIGUAL .)
+    FALSE           reduce using rule 52 (relacao -> MENORIGUAL .)
+    EPAR            reduce using rule 52 (relacao -> MENORIGUAL .)
+    NOT             reduce using rule 52 (relacao -> MENORIGUAL .)
+    MENOS           reduce using rule 52 (relacao -> MENORIGUAL .)
+
+
+state 66
+
+    (53) relacao -> MAIORQUE .
+
+    ID              reduce using rule 53 (relacao -> MAIORQUE .)
+    NUMERO          reduce using rule 53 (relacao -> MAIORQUE .)
+    TRUE            reduce using rule 53 (relacao -> MAIORQUE .)
+    FALSE           reduce using rule 53 (relacao -> MAIORQUE .)
+    EPAR            reduce using rule 53 (relacao -> MAIORQUE .)
+    NOT             reduce using rule 53 (relacao -> MAIORQUE .)
+    MENOS           reduce using rule 53 (relacao -> MAIORQUE .)
+
+
+state 67
+
+    (54) relacao -> MAIORIGUAL .
+
+    ID              reduce using rule 54 (relacao -> MAIORIGUAL .)
+    NUMERO          reduce using rule 54 (relacao -> MAIORIGUAL .)
+    TRUE            reduce using rule 54 (relacao -> MAIORIGUAL .)
+    FALSE           reduce using rule 54 (relacao -> MAIORIGUAL .)
+    EPAR            reduce using rule 54 (relacao -> MAIORIGUAL .)
+    NOT             reduce using rule 54 (relacao -> MAIORIGUAL .)
+    MENOS           reduce using rule 54 (relacao -> MAIORIGUAL .)
+
+
+state 68
+
+    (39) termo -> termo VEZES . fator
+    (42) fator -> . ID
+    (43) fator -> . NUMERO
+    (44) fator -> . TRUE
+    (45) fator -> . FALSE
+    (46) fator -> . EPAR expressao DPAR
+    (47) fator -> . NOT fator
+    (48) fator -> . MENOS fator
+
+    ID              shift and go to state 41
+    NUMERO          shift and go to state 42
+    TRUE            shift and go to state 43
+    FALSE           shift and go to state 44
+    EPAR            shift and go to state 45
+    NOT             shift and go to state 46
+    MENOS           shift and go to state 39
+
+    fator                          shift and go to state 84
+
+state 69
+
+    (40) termo -> termo DIV . fator
+    (42) fator -> . ID
+    (43) fator -> . NUMERO
+    (44) fator -> . TRUE
+    (45) fator -> . FALSE
+    (46) fator -> . EPAR expressao DPAR
+    (47) fator -> . NOT fator
+    (48) fator -> . MENOS fator
+
+    ID              shift and go to state 41
+    NUMERO          shift and go to state 42
+    TRUE            shift and go to state 43
+    FALSE           shift and go to state 44
+    EPAR            shift and go to state 45
+    NOT             shift and go to state 46
+    MENOS           shift and go to state 39
+
+    fator                          shift and go to state 85
+
+state 70
+
+    (48) fator -> MENOS fator .
+
+    VEZES           reduce using rule 48 (fator -> MENOS fator .)
+    DIV             reduce using rule 48 (fator -> MENOS fator .)
+    MAIS            reduce using rule 48 (fator -> MENOS fator .)
+    MENOS           reduce using rule 48 (fator -> MENOS fator .)
+    IGUAL           reduce using rule 48 (fator -> MENOS fator .)
+    DIFERENTE       reduce using rule 48 (fator -> MENOS fator .)
+    MENORQUE        reduce using rule 48 (fator -> MENOS fator .)
+    MENORIGUAL      reduce using rule 48 (fator -> MENOS fator .)
+    MAIORQUE        reduce using rule 48 (fator -> MENOS fator .)
+    MAIORIGUAL      reduce using rule 48 (fator -> MENOS fator .)
+    AND             reduce using rule 48 (fator -> MENOS fator .)
+    THEN            reduce using rule 48 (fator -> MENOS fator .)
+    OR              reduce using rule 48 (fator -> MENOS fator .)
+    DO              reduce using rule 48 (fator -> MENOS fator .)
+    PV              reduce using rule 48 (fator -> MENOS fator .)
+    END             reduce using rule 48 (fator -> MENOS fator .)
+    ELSE            reduce using rule 48 (fator -> MENOS fator .)
+    DPAR            reduce using rule 48 (fator -> MENOS fator .)
+    VIRG            reduce using rule 48 (fator -> MENOS fator .)
+
+
+state 71
+
+    (46) fator -> EPAR expressao . DPAR
+    (30) expressao -> expressao . OR expressao_and
+
+    DPAR            shift and go to state 86
+    OR              shift and go to state 57
+
+
+state 72
+
+    (47) fator -> NOT fator .
+
+    VEZES           reduce using rule 47 (fator -> NOT fator .)
+    DIV             reduce using rule 47 (fator -> NOT fator .)
+    MAIS            reduce using rule 47 (fator -> NOT fator .)
+    MENOS           reduce using rule 47 (fator -> NOT fator .)
+    IGUAL           reduce using rule 47 (fator -> NOT fator .)
+    DIFERENTE       reduce using rule 47 (fator -> NOT fator .)
+    MENORQUE        reduce using rule 47 (fator -> NOT fator .)
+    MENORIGUAL      reduce using rule 47 (fator -> NOT fator .)
+    MAIORQUE        reduce using rule 47 (fator -> NOT fator .)
+    MAIORIGUAL      reduce using rule 47 (fator -> NOT fator .)
+    AND             reduce using rule 47 (fator -> NOT fator .)
+    THEN            reduce using rule 47 (fator -> NOT fator .)
+    OR              reduce using rule 47 (fator -> NOT fator .)
+    DO              reduce using rule 47 (fator -> NOT fator .)
+    PV              reduce using rule 47 (fator -> NOT fator .)
+    END             reduce using rule 47 (fator -> NOT fator .)
+    ELSE            reduce using rule 47 (fator -> NOT fator .)
+    DPAR            reduce using rule 47 (fator -> NOT fator .)
+    VIRG            reduce using rule 47 (fator -> NOT fator .)
+
+
+state 73
+
+    (25) comando_enquanto -> WHILE expressao DO . comando
+    (15) comando -> . atribuicao
+    (16) comando -> . comando_condicional
+    (17) comando -> . comando_enquanto
+    (18) comando -> . comando_leitura
+    (19) comando -> . comando_escrita
+    (20) comando -> . comando_composto
+    (21) comando -> . empty
+    (22) atribuicao -> . ID DPIGUAL expressao
+    (23) comando_condicional -> . IF expressao THEN comando
+    (24) comando_condicional -> . IF expressao THEN comando ELSE comando
+    (25) comando_enquanto -> . WHILE expressao DO comando
+    (26) comando_leitura -> . READ EPAR lista_id DPAR
+    (27) comando_escrita -> . WRITE EPAR lista_expressoes DPAR
+    (11) comando_composto -> . BEGIN lista_comandos END
+    (55) empty -> .
+
+    ID              shift and go to state 24
+    IF              shift and go to state 25
+    WHILE           shift and go to state 26
+    READ            shift and go to state 27
+    WRITE           shift and go to state 28
+    BEGIN           shift and go to state 11
+    ELSE            reduce using rule 55 (empty -> .)
+    PV              reduce using rule 55 (empty -> .)
+    END             reduce using rule 55 (empty -> .)
+
+    comando                        shift and go to state 87
+    atribuicao                     shift and go to state 17
+    comando_condicional            shift and go to state 18
+    comando_enquanto               shift and go to state 19
+    comando_leitura                shift and go to state 20
+    comando_escrita                shift and go to state 21
+    comando_composto               shift and go to state 22
+    empty                          shift and go to state 23
+
+state 74
+
+    (26) comando_leitura -> READ EPAR lista_id . DPAR
+
+    DPAR            shift and go to state 88
+
+
+state 75
+
+    (27) comando_escrita -> WRITE EPAR lista_expressoes . DPAR
+
+    DPAR            shift and go to state 89
+
+
+state 76
+
+    (28) lista_expressoes -> expressao .
+    (29) lista_expressoes -> expressao . VIRG lista_expressoes
+    (30) expressao -> expressao . OR expressao_and
+
+    DPAR            reduce using rule 28 (lista_expressoes -> expressao .)
+    VIRG            shift and go to state 90
+    OR              shift and go to state 57
+
+
+state 77
+
+    (5) declaracao_variaveis -> lista_id DP tipo PV . declaracao_variaveis
+    (6) declaracao_variaveis -> lista_id DP tipo PV .
+    (5) declaracao_variaveis -> . lista_id DP tipo PV declaracao_variaveis
+    (6) declaracao_variaveis -> . lista_id DP tipo PV
+    (7) lista_id -> . ID
+    (8) lista_id -> . ID VIRG lista_id
+
+    BEGIN           reduce using rule 6 (declaracao_variaveis -> lista_id DP tipo PV .)
+    ID              shift and go to state 14
+
+    lista_id                       shift and go to state 13
+    declaracao_variaveis           shift and go to state 91
+
+state 78
+
+    (23) comando_condicional -> IF expressao THEN comando .
+    (24) comando_condicional -> IF expressao THEN comando . ELSE comando
+
+  ! shift/reduce conflict for ELSE resolved as shift
+    PV              reduce using rule 23 (comando_condicional -> IF expressao THEN comando .)
+    END             reduce using rule 23 (comando_condicional -> IF expressao THEN comando .)
+    ELSE            shift and go to state 92
+
+  ! ELSE            [ reduce using rule 23 (comando_condicional -> IF expressao THEN comando .) ]
+
+
+state 79
+
+    (30) expressao -> expressao OR expressao_and .
+    (32) expressao_and -> expressao_and . AND expressao_rel
+
+    THEN            reduce using rule 30 (expressao -> expressao OR expressao_and .)
+    OR              reduce using rule 30 (expressao -> expressao OR expressao_and .)
+    DO              reduce using rule 30 (expressao -> expressao OR expressao_and .)
+    PV              reduce using rule 30 (expressao -> expressao OR expressao_and .)
+    END             reduce using rule 30 (expressao -> expressao OR expressao_and .)
+    ELSE            reduce using rule 30 (expressao -> expressao OR expressao_and .)
+    DPAR            reduce using rule 30 (expressao -> expressao OR expressao_and .)
+    VIRG            reduce using rule 30 (expressao -> expressao OR expressao_and .)
+    AND             shift and go to state 58
+
+
+state 80
+
+    (32) expressao_and -> expressao_and AND expressao_rel .
+
+    AND             reduce using rule 32 (expressao_and -> expressao_and AND expressao_rel .)
+    THEN            reduce using rule 32 (expressao_and -> expressao_and AND expressao_rel .)
+    OR              reduce using rule 32 (expressao_and -> expressao_and AND expressao_rel .)
+    DO              reduce using rule 32 (expressao_and -> expressao_and AND expressao_rel .)
+    PV              reduce using rule 32 (expressao_and -> expressao_and AND expressao_rel .)
+    END             reduce using rule 32 (expressao_and -> expressao_and AND expressao_rel .)
+    ELSE            reduce using rule 32 (expressao_and -> expressao_and AND expressao_rel .)
+    DPAR            reduce using rule 32 (expressao_and -> expressao_and AND expressao_rel .)
+    VIRG            reduce using rule 32 (expressao_and -> expressao_and AND expressao_rel .)
+
+
+state 81
+
+    (34) expressao_rel -> soma relacao soma .
+    (36) soma -> soma . MAIS termo
+    (37) soma -> soma . MENOS termo
+
+    AND             reduce using rule 34 (expressao_rel -> soma relacao soma .)
+    THEN            reduce using rule 34 (expressao_rel -> soma relacao soma .)
+    OR              reduce using rule 34 (expressao_rel -> soma relacao soma .)
+    DO              reduce using rule 34 (expressao_rel -> soma relacao soma .)
+    PV              reduce using rule 34 (expressao_rel -> soma relacao soma .)
+    END             reduce using rule 34 (expressao_rel -> soma relacao soma .)
+    ELSE            reduce using rule 34 (expressao_rel -> soma relacao soma .)
+    DPAR            reduce using rule 34 (expressao_rel -> soma relacao soma .)
+    VIRG            reduce using rule 34 (expressao_rel -> soma relacao soma .)
+    MAIS            shift and go to state 60
+    MENOS           shift and go to state 61
+
+
+state 82
+
+    (36) soma -> soma MAIS termo .
+    (39) termo -> termo . VEZES fator
+    (40) termo -> termo . DIV fator
+
+    MAIS            reduce using rule 36 (soma -> soma MAIS termo .)
+    MENOS           reduce using rule 36 (soma -> soma MAIS termo .)
+    IGUAL           reduce using rule 36 (soma -> soma MAIS termo .)
+    DIFERENTE       reduce using rule 36 (soma -> soma MAIS termo .)
+    MENORQUE        reduce using rule 36 (soma -> soma MAIS termo .)
+    MENORIGUAL      reduce using rule 36 (soma -> soma MAIS termo .)
+    MAIORQUE        reduce using rule 36 (soma -> soma MAIS termo .)
+    MAIORIGUAL      reduce using rule 36 (soma -> soma MAIS termo .)
+    AND             reduce using rule 36 (soma -> soma MAIS termo .)
+    THEN            reduce using rule 36 (soma -> soma MAIS termo .)
+    OR              reduce using rule 36 (soma -> soma MAIS termo .)
+    DO              reduce using rule 36 (soma -> soma MAIS termo .)
+    PV              reduce using rule 36 (soma -> soma MAIS termo .)
+    END             reduce using rule 36 (soma -> soma MAIS termo .)
+    ELSE            reduce using rule 36 (soma -> soma MAIS termo .)
+    DPAR            reduce using rule 36 (soma -> soma MAIS termo .)
+    VIRG            reduce using rule 36 (soma -> soma MAIS termo .)
+    VEZES           shift and go to state 68
+    DIV             shift and go to state 69
+
+
+state 83
+
+    (37) soma -> soma MENOS termo .
+    (39) termo -> termo . VEZES fator
+    (40) termo -> termo . DIV fator
+
+    MAIS            reduce using rule 37 (soma -> soma MENOS termo .)
+    MENOS           reduce using rule 37 (soma -> soma MENOS termo .)
+    IGUAL           reduce using rule 37 (soma -> soma MENOS termo .)
+    DIFERENTE       reduce using rule 37 (soma -> soma MENOS termo .)
+    MENORQUE        reduce using rule 37 (soma -> soma MENOS termo .)
+    MENORIGUAL      reduce using rule 37 (soma -> soma MENOS termo .)
+    MAIORQUE        reduce using rule 37 (soma -> soma MENOS termo .)
+    MAIORIGUAL      reduce using rule 37 (soma -> soma MENOS termo .)
+    AND             reduce using rule 37 (soma -> soma MENOS termo .)
+    THEN            reduce using rule 37 (soma -> soma MENOS termo .)
+    OR              reduce using rule 37 (soma -> soma MENOS termo .)
+    DO              reduce using rule 37 (soma -> soma MENOS termo .)
+    PV              reduce using rule 37 (soma -> soma MENOS termo .)
+    END             reduce using rule 37 (soma -> soma MENOS termo .)
+    ELSE            reduce using rule 37 (soma -> soma MENOS termo .)
+    DPAR            reduce using rule 37 (soma -> soma MENOS termo .)
+    VIRG            reduce using rule 37 (soma -> soma MENOS termo .)
+    VEZES           shift and go to state 68
+    DIV             shift and go to state 69
+
+
+state 84
+
+    (39) termo -> termo VEZES fator .
+
+    VEZES           reduce using rule 39 (termo -> termo VEZES fator .)
+    DIV             reduce using rule 39 (termo -> termo VEZES fator .)
+    MAIS            reduce using rule 39 (termo -> termo VEZES fator .)
+    MENOS           reduce using rule 39 (termo -> termo VEZES fator .)
+    IGUAL           reduce using rule 39 (termo -> termo VEZES fator .)
+    DIFERENTE       reduce using rule 39 (termo -> termo VEZES fator .)
+    MENORQUE        reduce using rule 39 (termo -> termo VEZES fator .)
+    MENORIGUAL      reduce using rule 39 (termo -> termo VEZES fator .)
+    MAIORQUE        reduce using rule 39 (termo -> termo VEZES fator .)
+    MAIORIGUAL      reduce using rule 39 (termo -> termo VEZES fator .)
+    AND             reduce using rule 39 (termo -> termo VEZES fator .)
+    THEN            reduce using rule 39 (termo -> termo VEZES fator .)
+    OR              reduce using rule 39 (termo -> termo VEZES fator .)
+    DO              reduce using rule 39 (termo -> termo VEZES fator .)
+    PV              reduce using rule 39 (termo -> termo VEZES fator .)
+    END             reduce using rule 39 (termo -> termo VEZES fator .)
+    ELSE            reduce using rule 39 (termo -> termo VEZES fator .)
+    DPAR            reduce using rule 39 (termo -> termo VEZES fator .)
+    VIRG            reduce using rule 39 (termo -> termo VEZES fator .)
+
+
+state 85
+
+    (40) termo -> termo DIV fator .
+
+    VEZES           reduce using rule 40 (termo -> termo DIV fator .)
+    DIV             reduce using rule 40 (termo -> termo DIV fator .)
+    MAIS            reduce using rule 40 (termo -> termo DIV fator .)
+    MENOS           reduce using rule 40 (termo -> termo DIV fator .)
+    IGUAL           reduce using rule 40 (termo -> termo DIV fator .)
+    DIFERENTE       reduce using rule 40 (termo -> termo DIV fator .)
+    MENORQUE        reduce using rule 40 (termo -> termo DIV fator .)
+    MENORIGUAL      reduce using rule 40 (termo -> termo DIV fator .)
+    MAIORQUE        reduce using rule 40 (termo -> termo DIV fator .)
+    MAIORIGUAL      reduce using rule 40 (termo -> termo DIV fator .)
+    AND             reduce using rule 40 (termo -> termo DIV fator .)
+    THEN            reduce using rule 40 (termo -> termo DIV fator .)
+    OR              reduce using rule 40 (termo -> termo DIV fator .)
+    DO              reduce using rule 40 (termo -> termo DIV fator .)
+    PV              reduce using rule 40 (termo -> termo DIV fator .)
+    END             reduce using rule 40 (termo -> termo DIV fator .)
+    ELSE            reduce using rule 40 (termo -> termo DIV fator .)
+    DPAR            reduce using rule 40 (termo -> termo DIV fator .)
+    VIRG            reduce using rule 40 (termo -> termo DIV fator .)
+
+
+state 86
+
+    (46) fator -> EPAR expressao DPAR .
+
+    VEZES           reduce using rule 46 (fator -> EPAR expressao DPAR .)
+    DIV             reduce using rule 46 (fator -> EPAR expressao DPAR .)
+    MAIS            reduce using rule 46 (fator -> EPAR expressao DPAR .)
+    MENOS           reduce using rule 46 (fator -> EPAR expressao DPAR .)
+    IGUAL           reduce using rule 46 (fator -> EPAR expressao DPAR .)
+    DIFERENTE       reduce using rule 46 (fator -> EPAR expressao DPAR .)
+    MENORQUE        reduce using rule 46 (fator -> EPAR expressao DPAR .)
+    MENORIGUAL      reduce using rule 46 (fator -> EPAR expressao DPAR .)
+    MAIORQUE        reduce using rule 46 (fator -> EPAR expressao DPAR .)
+    MAIORIGUAL      reduce using rule 46 (fator -> EPAR expressao DPAR .)
+    AND             reduce using rule 46 (fator -> EPAR expressao DPAR .)
+    THEN            reduce using rule 46 (fator -> EPAR expressao DPAR .)
+    OR              reduce using rule 46 (fator -> EPAR expressao DPAR .)
+    DO              reduce using rule 46 (fator -> EPAR expressao DPAR .)
+    PV              reduce using rule 46 (fator -> EPAR expressao DPAR .)
+    END             reduce using rule 46 (fator -> EPAR expressao DPAR .)
+    ELSE            reduce using rule 46 (fator -> EPAR expressao DPAR .)
+    DPAR            reduce using rule 46 (fator -> EPAR expressao DPAR .)
+    VIRG            reduce using rule 46 (fator -> EPAR expressao DPAR .)
+
+
+state 87
+
+    (25) comando_enquanto -> WHILE expressao DO comando .
+
+    PV              reduce using rule 25 (comando_enquanto -> WHILE expressao DO comando .)
+    END             reduce using rule 25 (comando_enquanto -> WHILE expressao DO comando .)
+    ELSE            reduce using rule 25 (comando_enquanto -> WHILE expressao DO comando .)
+
+
+state 88
+
+    (26) comando_leitura -> READ EPAR lista_id DPAR .
+
+    PV              reduce using rule 26 (comando_leitura -> READ EPAR lista_id DPAR .)
+    END             reduce using rule 26 (comando_leitura -> READ EPAR lista_id DPAR .)
+    ELSE            reduce using rule 26 (comando_leitura -> READ EPAR lista_id DPAR .)
+
+
+state 89
+
+    (27) comando_escrita -> WRITE EPAR lista_expressoes DPAR .
+
+    PV              reduce using rule 27 (comando_escrita -> WRITE EPAR lista_expressoes DPAR .)
+    END             reduce using rule 27 (comando_escrita -> WRITE EPAR lista_expressoes DPAR .)
+    ELSE            reduce using rule 27 (comando_escrita -> WRITE EPAR lista_expressoes DPAR .)
+
+
+state 90
+
+    (29) lista_expressoes -> expressao VIRG . lista_expressoes
+    (28) lista_expressoes -> . expressao
+    (29) lista_expressoes -> . expressao VIRG lista_expressoes
+    (30) expressao -> . expressao OR expressao_and
+    (31) expressao -> . expressao_and
+    (32) expressao_and -> . expressao_and AND expressao_rel
+    (33) expressao_and -> . expressao_rel
+    (34) expressao_rel -> . soma relacao soma
+    (35) expressao_rel -> . soma
+    (36) soma -> . soma MAIS termo
+    (37) soma -> . soma MENOS termo
+    (38) soma -> . termo
+    (39) termo -> . termo VEZES fator
+    (40) termo -> . termo DIV fator
+    (41) termo -> . fator
+    (42) fator -> . ID
+    (43) fator -> . NUMERO
+    (44) fator -> . TRUE
+    (45) fator -> . FALSE
+    (46) fator -> . EPAR expressao DPAR
+    (47) fator -> . NOT fator
+    (48) fator -> . MENOS fator
+
+    ID              shift and go to state 41
+    NUMERO          shift and go to state 42
+    TRUE            shift and go to state 43
+    FALSE           shift and go to state 44
+    EPAR            shift and go to state 45
+    NOT             shift and go to state 46
+    MENOS           shift and go to state 39
+
+    expressao                      shift and go to state 76
+    lista_expressoes               shift and go to state 93
+    expressao_and                  shift and go to state 35
+    expressao_rel                  shift and go to state 36
+    soma                           shift and go to state 37
+    termo                          shift and go to state 38
+    fator                          shift and go to state 40
+
+state 91
+
+    (5) declaracao_variaveis -> lista_id DP tipo PV declaracao_variaveis .
+
+    BEGIN           reduce using rule 5 (declaracao_variaveis -> lista_id DP tipo PV declaracao_variaveis .)
+
+
+state 92
+
+    (24) comando_condicional -> IF expressao THEN comando ELSE . comando
+    (15) comando -> . atribuicao
+    (16) comando -> . comando_condicional
+    (17) comando -> . comando_enquanto
+    (18) comando -> . comando_leitura
+    (19) comando -> . comando_escrita
+    (20) comando -> . comando_composto
+    (21) comando -> . empty
+    (22) atribuicao -> . ID DPIGUAL expressao
+    (23) comando_condicional -> . IF expressao THEN comando
+    (24) comando_condicional -> . IF expressao THEN comando ELSE comando
+    (25) comando_enquanto -> . WHILE expressao DO comando
+    (26) comando_leitura -> . READ EPAR lista_id DPAR
+    (27) comando_escrita -> . WRITE EPAR lista_expressoes DPAR
+    (11) comando_composto -> . BEGIN lista_comandos END
+    (55) empty -> .
+
+    ID              shift and go to state 24
+    IF              shift and go to state 25
+    WHILE           shift and go to state 26
+    READ            shift and go to state 27
+    WRITE           shift and go to state 28
+    BEGIN           shift and go to state 11
+    ELSE            reduce using rule 55 (empty -> .)
+    PV              reduce using rule 55 (empty -> .)
+    END             reduce using rule 55 (empty -> .)
+
+    comando                        shift and go to state 94
+    atribuicao                     shift and go to state 17
+    comando_condicional            shift and go to state 18
+    comando_enquanto               shift and go to state 19
+    comando_leitura                shift and go to state 20
+    comando_escrita                shift and go to state 21
+    comando_composto               shift and go to state 22
+    empty                          shift and go to state 23
+
+state 93
+
+    (29) lista_expressoes -> expressao VIRG lista_expressoes .
+
+    DPAR            reduce using rule 29 (lista_expressoes -> expressao VIRG lista_expressoes .)
+
+
+state 94
+
+    (24) comando_condicional -> IF expressao THEN comando ELSE comando .
+
+    PV              reduce using rule 24 (comando_condicional -> IF expressao THEN comando ELSE comando .)
+    END             reduce using rule 24 (comando_condicional -> IF expressao THEN comando ELSE comando .)
+    ELSE            reduce using rule 24 (comando_condicional -> IF expressao THEN comando ELSE comando .)
+
+WARNING: 
+WARNING: Conflicts:
+WARNING: 
+WARNING: shift/reduce conflict for ELSE in state 78 resolved as shift
+WARNING: reduce/reduce conflict in state 32 resolved using rule (lista_comandos -> comando PV)
+WARNING: rejected rule (empty -> <empty>) in state 32

@@ -14,16 +14,19 @@ class Simbolo:
 tabela_variaveis: dict = {}
 erros_semanticos: list = []
 _next_desloc = 0
+erros_sintaticos: list = []
 
 def semantico_reset():
-    global tabela_variaveis, erros_semanticos, _next_desloc
-    tabela_variaveis = {}
-    erros_semanticos = []
+    global tabela_variaveis, _next_desloc
+    tabela_variaveis.clear()
+    erros_semanticos.clear()
+    erros_sintaticos.clear()
     _next_desloc = 0
 
 def erro_semantico(msg: str, linha: int):
-    print(f"ERRO SEMÂNTICO na linha {linha}: {msg}")
-    erros_semanticos.append(f"Linha {linha}: {msg}")
+    erro = f"ERRO SEMÂNTICO na linha {linha}: {msg}"
+    print(erro)
+    erros_semanticos.append(erro)
 
 def instala_programa(nome: str, linha: int):
     # opcional: pode registrar nome (não usado no resto)
@@ -97,7 +100,7 @@ def infer_tipo_expr(expr, linha):
         lt = infer_tipo_expr(expr.left, linha)
         rt = infer_tipo_expr(expr.right, linha)
         op = expr.op
-        if op in ('+', '-', '*', '/', 'MAIS', 'MENOS', 'VEZES', 'DIV'):
+        if op in ('+', '-', '*', '/', 'div', 'MAIS', 'MENOS', 'VEZES', 'DIV'):
             if lt != "integer" or rt != "integer":
                 erro_semantico(f"operador '{op}' requer operandos inteiros (obtido {lt} e {rt})", linha)
             expr.tipo = "integer"
@@ -264,15 +267,6 @@ def p_comando_enquanto(p):
     bloco = p[4] if isinstance(p[4], ast.BlocoCmds) else ast.BlocoCmds(lista_cmds=[p[4]]) if p[4] else ast.BlocoCmds([])
     p[0] = ast.Enquanto(cond=expr_node, bloco=bloco)
 
-def p_comando_repete(p):
-    """comando_repete : REPEAT comando_composto UNTIL expressao"""
-    linha = p.lineno(3)
-    expr_node = p[4]
-    tipo_cond = infer_tipo_expr(expr_node, linha)
-    if tipo_cond != "boolean":
-        erro_semantico("condição do REPEAT/UNTIL deve ser booleana", linha)
-    p[0] = ast.Repete(bloco=p[2], cond=expr_node)
-
 def p_comando_leitura(p):
     """comando_leitura : READ EPAR lista_id DPAR"""
     linha = p.lineno(1)
@@ -395,9 +389,12 @@ def p_empty(p):
 
 def p_error(p):
     if p:
-        print(f"ERRO SINTÁTICO: token inesperado '{p.value}' na linha {p.lineno}")
+        msg = f"ERRO SINTÁTICO: token inesperado '{p.value}' na linha {p.lineno}"
     else:
-        print("ERRO SINTÁTICO: fim de arquivo inesperado.")
+        msg = "ERRO SINTÁTICO: fim de arquivo inesperado."
+    
+    print(msg)
+    erros_sintaticos.append(msg)
 
 # construir parser
 parser = yacc.yacc()

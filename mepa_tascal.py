@@ -1,17 +1,16 @@
 # mepa_tascal.py — gerador MEPA (Visitor) que consome a AST retornada pelo parser_tascal
 from typing import List
 import ast_tascal_mepa as ast
-from parser_tascal_mepa import tabela_variaveis  # para acessar deslocamentos, se necessário
+import parser_tascal_mepa  # para acessar deslocamentos, se necessário
 
 NIVEL_LEXICO = 0
 
 class GeradorMEPA:
     MEPA_OP = {
-        '+': 'SOMA', '-': 'SUBT', '*': 'MULT', '/': 'DIVI',
-        'and': 'CONJ', 'or': 'DISJ',
+        '+': 'SOMA', '-': 'SUBT', '*': 'MULT', '/': 'DIVI', 'div': 'DIVI',
+        'and': 'CONJ', 'or': 'DISJ', 'not': 'NEGA',
         '=': 'CMIG', '<>': 'CMDG', '<': 'CMME',
         '<=': 'CMEG', '>=': 'CMAG', '>': 'CMMA',
-        'not': 'NEGA',
     }
 
     def __init__(self):
@@ -64,8 +63,8 @@ class GeradorMEPA:
         simb = None
         if isinstance(cmd.id, ast.CalcId):
             simb = cmd.id.simbolo
-            if simb is None and cmd.id.nome in tabela_variaveis:
-                simb = tabela_variaveis[cmd.id.nome]
+            if simb is None and cmd.id.nome in parser_tascal_mepa.tabela_variaveis:
+                simb = parser_tascal_mepa.tabela_variaveis[cmd.id.nome]
         if simb is None:
             # fallback: emitir comentário
             self._emite(f"; ARMZ ??? (variável não anotada: {cmd.id.nome})")
@@ -77,8 +76,8 @@ class GeradorMEPA:
             # emitir LEIT + ARMZ desloc
             self._emite("LEIT")
             simb = cid.simbolo
-            if simb is None and cid.nome in tabela_variaveis:
-                simb = tabela_variaveis[cid.nome]
+            if simb is None and cid.nome in parser_tascal_mepa.tabela_variaveis:
+                simb = parser_tascal_mepa.tabela_variaveis[cid.nome]
             if simb is None:
                 self._emite(f"; ARMZ ??? (variável não anotada: {getattr(cid,'nome',cid)})")
             else:
@@ -127,23 +126,25 @@ class GeradorMEPA:
         self.visita(expr.left)
         self.visita(expr.right)
         op = expr.op
-        mnem = self.MEPA_OP.get(op)
+        # normalize operator to string and lowercase when possible
+        op_norm = op.lower() if isinstance(op, str) else str(op)
+        mnem = self.MEPA_OP.get(op_norm)
         if mnem:
             self._emite(mnem)
         else:
-            # suportar tokens escritos com nomes diferentes (por exemplo 'MAIS' vs '+')
-            # tentar mapear símbolos usuais
-            if op == '+':
+            # fallback: try some common tokens
+            if op_norm == '+':
                 self._emite("SOMA")
-            elif op == '-':
+            elif op_norm == '-':
                 self._emite("SUBT")
-            elif op == '*':
+            elif op_norm == '*':
                 self._emite("MULT")
-            elif op in ('/', 'DIV'):
+            elif op_norm in ('/', 'div'):
                 self._emite("DIVI")
             else:
                 self._emite(f"; Operador não mapeado: {op}")
-
+                self.erros.append(f"Operador não mapeado: {op}")
+                
     def visita_CalculoUnario(self, expr: ast.CalculoUnario):
         if expr.op == '-':
             # -x -> avaliar x, multiplicar por -1
@@ -165,8 +166,8 @@ class GeradorMEPA:
 
     def visita_CalcId(self, idnode: ast.CalcId):
         simb = idnode.simbolo
-        if simb is None and idnode.nome in tabela_variaveis:
-            simb = tabela_variaveis[idnode.nome]
+        if simb is None and idnode.nome in parser_tascal_mepa.tabela_variaveis:
+            simb = parser_tascal_mepa.tabela_variaveis[idnode.nome]
         if simb is None:
             self._emite(f"; CRVL ??? (variável não anotada: {idnode.nome})")
         else:

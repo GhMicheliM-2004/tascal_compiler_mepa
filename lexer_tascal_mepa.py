@@ -2,6 +2,8 @@
 # Analisador léxico para a linguagem Tascal usando PLY
 import ply.lex as lex
 
+erros_lexicos = []  # Lista para armazenar erros léxicos
+
 palavras_reservadas = { # Palavras reservadas do Tascal
     'program': 'PROGRAM',
     'var': 'VAR',
@@ -69,10 +71,15 @@ def t_newline(t): # Quebra de linha
 
 def t_COMMENT(t): # Comentários -> Não são permitidos
     r'\{[^}]*\}'
-    print(f"ERRO LÉXICO: Comentários não são permitidos (linha {t.lineno})")
+    msg = f"ERRO LÉXICO: Comentários não são permitidos (linha {t.lineno})"
+    print(msg)
+    erros_lexicos.append(msg)
 
 def t_error(t): # Tratamento de erros léxicos
-    print(f"ERRO LÉXICO: Símbolo ilegal '{t.value[0]}' na linha {t.lineno}")
+    msg = f"ERRO LÉXICO: Símbolo ilegal '{t.value[0]}' na linha {t.lineno}"
+    print(msg)
+    erros_lexicos.append(msg)
+    t.lexer.skip(1)
 
 # Construção do analisador léxico
 lexico = lex.lex()
