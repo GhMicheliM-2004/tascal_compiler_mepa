@@ -250,11 +250,22 @@ def p_comando_condicional(p):
     if tipo_cond != "boolean":
         erro_semantico("condição do IF deve ser booleana", linha)
     # construir nós then/else: p[4] e possivelmente p[6]
-    then_node = p[4] if isinstance(p[4], ast.BlocoCmds) else ast.BlocoCmds(lista_cmds=[p[4]]) if p[4] else ast.BlocoCmds([])
-    if len(p) == 6:
+    then_node = (
+        p[4] if isinstance(p[4], ast.BlocoCmds)
+        else ast.BlocoCmds(lista_cmds=[p[4]]) if p[4]
+        else ast.BlocoCmds([])
+    )
+
+    if len(p) == 5:
+        # IF expr THEN comando   ✅ SEM ELSE
         p[0] = ast.Condicional(cond=expr_node, then_cmd=then_node, else_cmd=None)
     else:
-        else_node = p[6] if isinstance(p[6], ast.BlocoCmds) else ast.BlocoCmds(lista_cmds=[p[6]]) if p[6] else ast.BlocoCmds([])
+        # IF expr THEN comando ELSE comando ✅ COM ELSE
+        else_node = (
+            p[6] if isinstance(p[6], ast.BlocoCmds)
+            else ast.BlocoCmds(lista_cmds=[p[6]]) if p[6]
+            else ast.BlocoCmds([])
+        )
         p[0] = ast.Condicional(cond=expr_node, then_cmd=then_node, else_cmd=else_node)
 
 def p_comando_enquanto(p):
