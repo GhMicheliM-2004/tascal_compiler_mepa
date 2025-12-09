@@ -1,0 +1,27 @@
+$ py mepa_pt.py --progfile ../testes/arquivos_mepacal/P05.mepacal
+
+Interpretador Mepa versão 5.0
+=============================
+
+
+Opções:
+-------
+    messfile:  stderr
+      infile:  stdin
+     outfile:  stdout
+    progfile:  ../testes/arquivos_mepacal/P05.mepacal
+ programsize:  500
+   stacksize:  500
+ displaysize:  10
+       limit:  10000
+        help:  False
+   copyright:  False
+       debug:  False
+     nocheck:  False
+      silent:  False
+        step:  False
+
+9
+1
+
+13 instruções executadas
