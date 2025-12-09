@@ -1,44 +1,44 @@
-# parser_tascal.py — parser + semântica (mantém checagens) e agora retorna AST
+# Script do analisador sintático e semântico do Tascal
+# Realiza verificação de tipos, declarações e usos de variáveis
+# Gera mensagens de erro semântico detalhadas, parser + semântica e retorna AST
 import ply.yacc as yacc
 from lexer_tascal_mepa import tokens
 import ast_tascal_mepa as ast
 
-# Tabela de símbolos simples (nome -> tipo/desloc)
-class Simbolo:
+class Simbolo: # Tabela de símbolos simples
     def __init__(self, nome: str, tipo: str, desloc: int):
         self.nome = nome
         self.tipo = tipo
         self.desloc = desloc
 
-# estado semântico global (estilo do seu parser original)
+# Estado semântico global (simples)
 tabela_variaveis: dict = {}
 erros_semanticos: list = []
 _next_desloc = 0
 erros_sintaticos: list = []
 
-def semantico_reset():
-    global tabela_variaveis, _next_desloc
-    tabela_variaveis.clear()
+def semantico_reset(): # Reseta o estado semântico
+    global tabela_variaveis, _next_desloc # Estado global do analisador semântico
+    tabela_variaveis.clear() 
     erros_semanticos.clear()
     erros_sintaticos.clear()
-    _next_desloc = 0
+    _next_desloc = 0 # Próximo deslocamento disponível
 
-def erro_semantico(msg: str, linha: int):
+def erro_semantico(msg: str, linha: int): # Registra um erro semântico
     erro = f"ERRO SEMÂNTICO na linha {linha}: {msg}"
     print(erro)
     erros_semanticos.append(erro)
 
-def instala_programa(nome: str, linha: int):
-    # opcional: pode registrar nome (não usado no resto)
+def instala_programa(nome: str, linha: int): # Registra o programa principal
     return
 
-def instala_variavel(nome: str, tipo: str, linha: int):
+def instala_variavel(nome: str, tipo: str, linha: int): # Registra uma variável na tabela de símbolos
     global tabela_variaveis, _next_desloc
     if nome in tabela_variaveis:
-        erro_semantico(f"variável '{nome}' já declarada", linha)
+        erro_semantico(f"variável '{nome}' já declarada", linha) # Erro se redeclarada
     else:
-        tabela_variaveis[nome] = Simbolo(nome, tipo, _next_desloc)
-        _next_desloc += 1
+        tabela_variaveis[nome] = Simbolo(nome, tipo, _next_desloc) # Adiciona à tabela
+        _next_desloc += 1 # Incrementa deslocamento
 
 def busca_variavel(nome: str, linha: int):
     if nome not in tabela_variaveis:
@@ -46,49 +46,44 @@ def busca_variavel(nome: str, linha: int):
         return None
     return tabela_variaveis[nome]
 
-# precedence (mesmo que seu parser original)
-precedence = (
+precedence = ( # Define precedência dos operadores para análise correta
+    ('nonassoc', 'IFX'),      # precedência para IF sem ELSE
+    ('nonassoc', 'ELSE'),     # Correção do primeiro trabaho (if deve vir primeiro)
     ('left', 'OR'),
     ('left', 'AND'),
     ('nonassoc', 'IGUAL', 'DIFERENTE', 'MENORQUE', 'MENORIGUAL', 'MAIORQUE', 'MAIORIGUAL'),
     ('left', 'MAIS', 'MENOS'),
     ('left', 'VEZES', 'DIV'),
-    ('right', 'NOT', 'UMINUS'),
+    ('right', 'NOT'), # Correção do primeiro trabaho (NOT associativo para direita)
+    ('right', 'UMINUS') 
 )
 
-# ---------------------------
-# Funções utilitárias de inferência de tipo a partir de AST
-# (usamos para manter semântica dentro do parser, porém retornando AST)
-# ---------------------------
+# Funções utilitárias de inferência de tipo a partir de AST (usamos para manter semântica dentro do parser, porém retornando AST)
 def infer_tipo_expr(expr, linha):
-    """
-    Recebe um nó AST de expressão e tenta inferir/validar tipos,
-    emitindo erros via erro_semantico(linha).
-    Retorna 'integer' | 'boolean' | None
-    """
-    # Constantes
-    if isinstance(expr, ast.CalcConstNum):
+    # Recebe um nó AST de expressão e infere tipos, emitindo erros via erro_semantico(linha). Retorna 'integer' | 'boolean' | None
+    
+    if isinstance(expr, ast.CalcConstNum): # Constante numérica
         expr.tipo = "integer"
         return "integer"
-    if isinstance(expr, ast.CalcConstBool):
+    if isinstance(expr, ast.CalcConstBool): # Constante booleana
         expr.tipo = "boolean"
         return "boolean"
     if isinstance(expr, ast.CalcId):
-        simbolo = busca_variavel(expr.nome, linha)
+        simbolo = busca_variavel(expr.nome, linha) # Verifica se variável existe e obtém símbolo
         if simbolo is None:
             expr.tipo = None
             return None
         expr.simbolo = simbolo
         expr.tipo = simbolo.tipo
         return simbolo.tipo
-    if isinstance(expr, ast.CalculoUnario):
+    if isinstance(expr, ast.CalculoUnario): # Operador unário
         t = infer_tipo_expr(expr.operand, linha)
         if expr.op == 'not':
-            if t != "boolean":
+            if t != "boolean": # Verifica tipo
                 erro_semantico(f"operador 'not' requer expressão booleana (obtido {t})", linha)
             expr.tipo = "boolean"
             return "boolean"
-        elif expr.op == '-':
+        elif expr.op == '-': # Operador negativo
             if t != "integer":
                 erro_semantico(f"operador unário '-' requer expressão inteira (obtido {t})", linha)
             expr.tipo = "integer"
@@ -96,42 +91,35 @@ def infer_tipo_expr(expr, linha):
         else:
             erro_semantico(f"operador unário desconhecido '{expr.op}'", linha)
             return None
-    if isinstance(expr, ast.CalculoBinario):
+    if isinstance(expr, ast.CalculoBinario): # Operador binário
         lt = infer_tipo_expr(expr.left, linha)
         rt = infer_tipo_expr(expr.right, linha)
         op = expr.op
-        if op in ('+', '-', '*', '/', 'div', 'MAIS', 'MENOS', 'VEZES', 'DIV'):
+        if op in ('+', '-', '*', '/', 'div', 'MAIS', 'MENOS', 'VEZES', 'DIV'): # Operadores aritméticos
             if lt != "integer" or rt != "integer":
                 erro_semantico(f"operador '{op}' requer operandos inteiros (obtido {lt} e {rt})", linha)
             expr.tipo = "integer"
             return "integer"
-        if op in ('and', 'or', 'AND', 'OR'):
+        if op in ('and', 'or', 'AND', 'OR'): # Operadores lógicos
             if lt != "boolean" or rt != "boolean":
                 erro_semantico(f"operador '{op}' requer operandos booleanos (obtido {lt} e {rt})", linha)
             expr.tipo = "boolean"
             return "boolean"
-        if op in ('=', '<>', 'IGUAL', 'DIFERENTE'):
+        if op in ('=', '<>', 'IGUAL', 'DIFERENTE'): # Operadores de igualdade
             if lt != rt:
                 erro_semantico(f"operador '{op}' requer operandos do mesmo tipo (obtido {lt} e {rt})", linha)
             expr.tipo = "boolean"
             return "boolean"
-        if op in ('<', '<=', '>', '>=', 'MENORQUE', 'MENORIGUAL', 'MAIORQUE', 'MAIORIGUAL'):
+        if op in ('<', '<=', '>', '>=', 'MENORQUE', 'MENORIGUAL', 'MAIORQUE', 'MAIORIGUAL'): # Operadores relacionais
             if lt != "integer" or rt != "integer":
                 erro_semantico(f"operador '{op}' requer operandos inteiros (obtido {lt} e {rt})", linha)
             expr.tipo = "boolean"
             return "boolean"
-        # fallback
         erro_semantico(f"operador binário desconhecido '{op}'", linha)
         return None
-    # unknown
     return None
 
-# ---------------------------
-# Regras do parser — mantêm as checagens semânticas originais
-# e também constroem e retornam nós AST (estilo parser_cldin2)
-# ---------------------------
-
-def p_programa(p):
+def p_programa(p): # Regra principal do programa, serve para iniciar a análise e finalizar
     """programa : PROGRAM ID PV bloco PF"""
     instala_programa(p[2], p.lineno(2))
     # bloco já é um BlocoCmds
@@ -140,81 +128,72 @@ def p_programa(p):
     prog.total_vars = len(tabela_variaveis)
     p[0] = prog
 
-def p_bloco(p):
+def p_bloco(p):  # Regra do bloco principal do programa, serve para agrupar declarações e comandos
     """bloco : declaracoes comando_composto"""
-    # comando_composto retorna BlocoCmds; declaracoes pode ter inserido Declaracao nodes into the block
     p[0] = p[2]
 
-def p_declaracoes(p):
+def p_declaracoes(p):  # Regra para declarações de variáveis
     """declaracoes : VAR declaracao_variaveis
                    | empty"""
-    # declaracao_variaveis already handled installations and returns list of Declaracao nodes
     if len(p) == 3:
-        # p[2] is list of Declaracao nodes
-        # We will attach them by prepending into upcoming block when building bloco,
-        # but simpler: return them to caller (we'll merge in comando_composto if needed)
         p[0] = p[2]
     else:
         p[0] = []
 
-def p_declaracao_variaveis(p):
+def p_declaracao_variaveis(p): # Regra para declaração de variáveis, suporta múltiplas declarações e listas de IDs
     """declaracao_variaveis : lista_id DP tipo PV declaracao_variaveis
                             | lista_id DP tipo PV"""
     ids = p[1]
     tipo = p[3]
     linha = p.lineno(1)
-    # instala cada variável (mantendo semântica)
+    # instala cada variável
     for nome in ids:
         instala_variavel(nome, tipo, linha)
     # criar nó Declaracao
     decl = ast.Declaracao(ids=ids, tipo=tipo)
     if len(p) == 6:
-        # há sequência
-        rest = p[5]  # lista de Declaracao
+        rest = p[5]  # lista de declarações restantes
         p[0] = [decl] + rest
     else:
         p[0] = [decl]
 
-def p_lista_id(p):
+def p_lista_id(p): # Regra para lista de identificadores (variáveis)
     """lista_id : ID
                 | ID VIRG lista_id"""
-    if len(p) == 2:
+    if len(p) == 2: # Se o len for 2, é apenas um ID
         p[0] = [p[1]]
-    else:
+    else: # Senão, é uma lista
         p[0] = [p[1]] + p[3]
 
-def p_tipo(p):
+def p_tipo(p):  # Regra para tipos de variáveis
     """tipo : INTEGER
             | BOOLEAN"""
-    p[0] = p[1].lower()
+    p[0] = p[1].lower() # Retorna o tipo em minúsculo (lower)
 
-def p_comando_composto(p):
+def p_comando_composto(p): # Regra para comandos compostos (blocos de comandos)
     """comando_composto : BEGIN lista_comandos END"""
-    # lista_comandos returns a BlocoCmds
     p[0] = p[2]
 
-def p_lista_comandos(p):
+def p_lista_comandos(p): # Regra para lista de comandos, ou seja, múltiplos comandos separados
     """lista_comandos : comando
                       | comando PV lista_comandos
                       | comando PV"""
     if len(p) == 2:
-        # single command: create block with it (unless it's None)
         if p[1] is None:
             p[0] = ast.BlocoCmds(lista_cmds=[])
         elif isinstance(p[1], ast.BlocoCmds):
             p[0] = p[1]
         else:
             p[0] = ast.BlocoCmds(lista_cmds=[p[1]])
+    # comando PV lista_comandos
     elif len(p) == 4:
-        # comando PV lista_comandos
         left = [] if p[1] is None else ([p[1]] if not isinstance(p[1], ast.BlocoCmds) else p[1].lista_cmds)
         right = p[3].lista_cmds if isinstance(p[3], ast.BlocoCmds) else []
         p[0] = ast.BlocoCmds(lista_cmds=left + right)
     else:
-        # comando PV (trailing)
         p[0] = ast.BlocoCmds(lista_cmds=[p[1]] if p[1] is not None else [])
 
-def p_comando(p):
+def p_comando(p): # Regra para comandos individuais
     """comando : atribuicao
                | comando_condicional
                | comando_enquanto
@@ -224,13 +203,13 @@ def p_comando(p):
                | empty"""
     p[0] = p[1]
 
-def p_atribuicao(p):
+def p_atribuicao(p): # Regra para atribuição de valores a variáveis
     """atribuicao : ID DPIGUAL expressao"""
     linha = p.lineno(1)
-    # semântica: verificar variável
+    # verificar variável
     tipo_var = busca_variavel(p[1], linha)
     expr_node = p[3]
-    # inferir tipo da expressão (faz verificações internas)
+    # inferir tipo da expressão e comparar
     tipo_expr = infer_tipo_expr(expr_node, linha)
     if tipo_var and tipo_expr and tipo_var.tipo != tipo_expr:
         erro_semantico(f"atribuição incompatível: variável '{p[1]}' é {tipo_var.tipo}, expressão é {tipo_expr}", linha)
@@ -241,34 +220,32 @@ def p_atribuicao(p):
         calc_id.tipo = tipo_var.tipo
     p[0] = ast.Atribuicao(id=calc_id, expr=expr_node)
 
-def p_comando_condicional(p):
-    """comando_condicional : IF expressao THEN comando
+def p_comando_condicional(p): # Regra para comando condicional IF-THEN-ELSE
+    """comando_condicional : IF expressao THEN comando %prec IFX
                            | IF expressao THEN comando ELSE comando"""
     linha = p.lineno(1)
     expr_node = p[2]
     tipo_cond = infer_tipo_expr(expr_node, linha)
     if tipo_cond != "boolean":
         erro_semantico("condição do IF deve ser booleana", linha)
-    # construir nós then/else: p[4] e possivelmente p[6]
+    # construir nós then/else
     then_node = (
         p[4] if isinstance(p[4], ast.BlocoCmds)
         else ast.BlocoCmds(lista_cmds=[p[4]]) if p[4]
         else ast.BlocoCmds([])
     )
 
-    if len(p) == 5:
-        # IF expr THEN comando   ✅ SEM ELSE
-        p[0] = ast.Condicional(cond=expr_node, then_cmd=then_node, else_cmd=None)
+    if len(p) == 5: # sem ELSE
+        p[0] = ast.Condicional(cond=expr_node, then_cmd=then_node, else_cmd=None) 
     else:
-        # IF expr THEN comando ELSE comando ✅ COM ELSE
-        else_node = (
+        else_node = ( # com ELSE
             p[6] if isinstance(p[6], ast.BlocoCmds)
             else ast.BlocoCmds(lista_cmds=[p[6]]) if p[6]
             else ast.BlocoCmds([])
         )
         p[0] = ast.Condicional(cond=expr_node, then_cmd=then_node, else_cmd=else_node)
 
-def p_comando_enquanto(p):
+def p_comando_enquanto(p): # Regra para comando de repetição WHILE-DO
     """comando_enquanto : WHILE expressao DO comando"""
     linha = p.lineno(1)
     expr_node = p[2]
@@ -278,7 +255,7 @@ def p_comando_enquanto(p):
     bloco = p[4] if isinstance(p[4], ast.BlocoCmds) else ast.BlocoCmds(lista_cmds=[p[4]]) if p[4] else ast.BlocoCmds([])
     p[0] = ast.Enquanto(cond=expr_node, bloco=bloco)
 
-def p_comando_leitura(p):
+def p_comando_leitura(p): # Regra para comando de leitura READ
     """comando_leitura : READ EPAR lista_id DPAR"""
     linha = p.lineno(1)
     # verificar variáveis existem e construir CalcId list
@@ -295,7 +272,7 @@ def p_comando_leitura(p):
             calc_ids.append(cid)
     p[0] = ast.Leitura(ids=calc_ids)
 
-def p_comando_escrita(p):
+def p_comando_escrita(p): # Regra para comando de escrita WRITE
     """comando_escrita : WRITE EPAR lista_expressoes DPAR"""
     linha = p.lineno(1)
     # validar tipos das expressões
@@ -305,7 +282,7 @@ def p_comando_escrita(p):
             erro_semantico(f"write() recebeu tipo inválido '{t}'", linha)
     p[0] = ast.Escrita(exprs=p[3])
 
-def p_lista_expressoes(p):
+def p_lista_expressoes(p): # Regra para lista de expressões
     """lista_expressoes : expressao
                         | expressao VIRG lista_expressoes"""
     if len(p) == 2:
@@ -313,19 +290,15 @@ def p_lista_expressoes(p):
     else:
         p[0] = [p[1]] + p[3]
 
-# ---------------------------
-# EXPRESSÕES: agora retornam nós AST (e depois inferimos tipos)
-# ---------------------------
-
-def p_expressao_or(p):
+def p_expressao_or(p): # Regras para expressões lógicas e aritméticas
     """expressao : expressao OR expressao_and
                  | expressao_and"""
     if len(p) == 2:
         p[0] = p[1]
     else:
-        p[0] = ast.CalculoBinario(left=p[1], op='or', right=p[3])
+        p[0] = ast.CalculoBinario(left=p[1], op='or', right=p[3]) # Nó de operação binária 'or'
 
-def p_expressao_and(p):
+def p_expressao_and(p): # Regras para expressões lógicas e aritméticas
     """expressao_and : expressao_and AND expressao_rel
                       | expressao_rel"""
     if len(p) == 2:
@@ -333,7 +306,7 @@ def p_expressao_and(p):
     else:
         p[0] = ast.CalculoBinario(left=p[1], op='and', right=p[3])
 
-def p_expressao_rel(p):
+def p_expressao_rel(p): # Regras para expressões relacionais
     """expressao_rel : soma relacao soma
                      | soma"""
     if len(p) == 2:
@@ -341,7 +314,7 @@ def p_expressao_rel(p):
     else:
         p[0] = ast.CalculoBinario(left=p[1], op=p[2], right=p[3])
 
-def p_soma(p):
+def p_soma(p): # Regras para expressões de soma e subtração 
     """soma : soma MAIS termo
             | soma MENOS termo
             | termo"""
@@ -350,7 +323,7 @@ def p_soma(p):
     else:
         p[0] = ast.CalculoBinario(left=p[1], op=p[2], right=p[3])
 
-def p_termo(p):
+def p_termo(p): # Regras para expressões de multiplicação e divisão
     """termo : termo VEZES fator
              | termo DIV fator
              | fator"""
@@ -359,7 +332,7 @@ def p_termo(p):
     else:
         p[0] = ast.CalculoBinario(left=p[1], op=p[2], right=p[3])
 
-def p_fator(p):
+def p_fator(p): # Regras para fatores (números, IDs, parênteses, negação)
     """fator : ID
              | NUMERO
              | TRUE
@@ -385,7 +358,7 @@ def p_fator(p):
     elif p.slice[1].type == "MENOS":
         p[0] = ast.CalculoUnario(op='-', operand=p[2])
 
-def p_relacao(p):
+def p_relacao(p): # Regras para operadores relacionais
     """relacao : IGUAL
                | DIFERENTE
                | MENORQUE
@@ -394,11 +367,11 @@ def p_relacao(p):
                | MAIORIGUAL"""
     p[0] = p[1]
 
-def p_empty(p):
+def p_empty(p): # Regra para produção vazia
     """empty :"""
     p[0] = None
 
-def p_error(p):
+def p_error(p): # Função de tratamento de erros sintáticos
     if p:
         msg = f"ERRO SINTÁTICO: token inesperado '{p.value}' na linha {p.lineno}"
     else:
@@ -407,5 +380,5 @@ def p_error(p):
     print(msg)
     erros_sintaticos.append(msg)
 
-# construir parser
+# Construir parser
 parser = yacc.yacc()

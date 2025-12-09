@@ -1,11 +1,11 @@
-# mepa_tascal.py — gerador MEPA (Visitor) que consome a AST retornada pelo parser_tascal
+# Gerador MEPA que consome a AST retornada pelo parser_tascal_mepa.py
 from typing import List
 import ast_tascal_mepa as ast
 import parser_tascal_mepa  # para acessar deslocamentos, se necessário
 
-NIVEL_LEXICO = 0
+NIVEL_LEXICO = 0 # nível léxico fixo para variáveis globais
 
-class GeradorMEPA:
+class GeradorMEPA: # gerador de código MEPA
     MEPA_OP = {
         '+': 'SOMA', '-': 'SUBT', '*': 'MULT', '/': 'DIVI', 'div': 'DIVI',
         'and': 'CONJ', 'or': 'DISJ', 'not': 'NEGA',
@@ -13,22 +13,22 @@ class GeradorMEPA:
         '<=': 'CMEG', '>=': 'CMAG', '>': 'CMMA',
     }
 
-    def __init__(self):
+    def __init__(self): # inicializa gerador
         self.codigo: List[str] = []
         self.rotulo_cont = 0
         self.erros: List[str] = []
 
-    def _novo_rotulo(self) -> str:
+    def _novo_rotulo(self) -> str: # gera novo rótulo
         self.rotulo_cont += 1
         return f"R{self.rotulo_cont:02d}"
 
-    def _emite(self, instr: str):
+    def _emite(self, instr: str): # emite instrução MEPA
         self.codigo.append(f"     {instr}")
 
-    def _emite_rotulo(self, r: str):
+    def _emite_rotulo(self, r: str): # emite rótulo MEPA
         self.codigo.append(f"{r}: NADA")
 
-    def gera(self, prog: ast.Programa) -> List[str]:
+    def gera(self, prog: ast.Programa) -> List[str]: # gera código MEPA para o programa
         # cabeçalho
         self._emite("INPP")
         if prog.total_vars > 0:
@@ -40,7 +40,7 @@ class GeradorMEPA:
         self._emite("FIM")
         return self.codigo
 
-    def visita(self, node):
+    def visita(self, node): # visita nó da AST
         m = 'visita_' + node.__class__.__name__
         fn = getattr(self, m, None)
         if fn is None:
@@ -48,32 +48,29 @@ class GeradorMEPA:
             return
         return fn(node)
 
-    def visita_BlocoCmds(self, bloco: ast.BlocoCmds):
+    def visita_BlocoCmds(self, bloco: ast.BlocoCmds): # visita bloco de comandos
         for cmd in bloco.lista_cmds:
             self.visita(cmd)
 
-    def visita_Declaracao(self, decl: ast.Declaracao):
-        # nada a emitir (AMEM no header). Mantemos declaração para compatibilidade.
+    def visita_Declaracao(self, decl: ast.Declaracao): # visita declaração 
         return
 
-    def visita_Atribuicao(self, cmd: ast.Atribuicao):
+    def visita_Atribuicao(self, cmd: ast.Atribuicao): # visita comando de atribuição
         # gerar expressão
         self.visita(cmd.expr)
         # armazenar no endereço da variável
         simb = None
-        if isinstance(cmd.id, ast.CalcId):
+        if isinstance(cmd.id, ast.CalcId): # pode ser CalcId ou outro tipo de nó
             simb = cmd.id.simbolo
             if simb is None and cmd.id.nome in parser_tascal_mepa.tabela_variaveis:
                 simb = parser_tascal_mepa.tabela_variaveis[cmd.id.nome]
         if simb is None:
-            # fallback: emitir comentário
             self._emite(f"; ARMZ ??? (variável não anotada: {cmd.id.nome})")
         else:
             self._emite(f"ARMZ {NIVEL_LEXICO},{simb.desloc}")
 
-    def visita_Leitura(self, cmd: ast.Leitura):
+    def visita_Leitura(self, cmd: ast.Leitura): # visita comando de leitura
         for cid in cmd.ids:
-            # emitir LEIT + ARMZ desloc
             self._emite("LEIT")
             simb = cid.simbolo
             if simb is None and cid.nome in parser_tascal_mepa.tabela_variaveis:
@@ -83,12 +80,12 @@ class GeradorMEPA:
             else:
                 self._emite(f"ARMZ {NIVEL_LEXICO},{simb.desloc}")
 
-    def visita_Escrita(self, cmd: ast.Escrita):
+    def visita_Escrita(self, cmd: ast.Escrita): # visita comando de escrita
         for e in cmd.exprs:
             self.visita(e)
             self._emite("IMPR")
 
-    def visita_Condicional(self, cmd: ast.Condicional):
+    def visita_Condicional(self, cmd: ast.Condicional): # visita comando condicional
         r_else = self._novo_rotulo()
         r_end = self._novo_rotulo()
         # condição
@@ -104,7 +101,7 @@ class GeradorMEPA:
         # end label
         self._emite_rotulo(r_end)
 
-    def visita_Enquanto(self, cmd: ast.Enquanto):
+    def visita_Enquanto(self, cmd: ast.Enquanto): # visita comando while
         r_begin = self._novo_rotulo()
         r_false = self._novo_rotulo()
         self._emite_rotulo(r_begin)
@@ -114,25 +111,22 @@ class GeradorMEPA:
         self._emite(f"DSVS {r_begin}")
         self._emite_rotulo(r_false)
 
-    def visita_Repete(self, cmd: ast.Repete):
+    def visita_Repete(self, cmd: ast.Repete): # visita comando repeat-until
         r_begin = self._novo_rotulo()
         self._emite_rotulo(r_begin)
         self.visita(cmd.bloco)
         self.visita(cmd.cond)
         self._emite(f"DSVF {r_begin}")
 
-    # ---------- EXPRESSÕES ----------
-    def visita_CalculoBinario(self, expr: ast.CalculoBinario):
+    def visita_CalculoBinario(self, expr: ast.CalculoBinario): # visita cálculo binário
         self.visita(expr.left)
         self.visita(expr.right)
         op = expr.op
-        # normalize operator to string and lowercase when possible
         op_norm = op.lower() if isinstance(op, str) else str(op)
         mnem = self.MEPA_OP.get(op_norm)
         if mnem:
             self._emite(mnem)
         else:
-            # fallback: try some common tokens
             if op_norm == '+':
                 self._emite("SOMA")
             elif op_norm == '-':
@@ -145,26 +139,23 @@ class GeradorMEPA:
                 self._emite(f"; Operador não mapeado: {op}")
                 self.erros.append(f"Operador não mapeado: {op}")
                 
-    def visita_CalculoUnario(self, expr: ast.CalculoUnario):
+    def visita_CalculoUnario(self, expr: ast.CalculoUnario): # visita cálculo unário
         if expr.op == '-':
-            # -x -> avaliar x, multiplicar por -1
             self.visita(expr.operand)
             self._emite("CRCT -1")
             self._emite("MULT")
         elif expr.op == 'not':
-            # not x -> avaliar x; NEGA (se sua MEPA tiver NEGA)
             self.visita(expr.operand)
             mnem = self.MEPA_OP.get('not', None)
             if mnem:
                 self._emite(mnem)
             else:
-                # alternativa: CRCT 0 ; CMIG  (x == 0)
                 self._emite("CRCT 0")
                 self._emite("CMIG")
         else:
             self._emite(f"; unário desconhecido {expr.op}")
 
-    def visita_CalcId(self, idnode: ast.CalcId):
+    def visita_CalcId(self, idnode: ast.CalcId): # visita nó de identificação
         simb = idnode.simbolo
         if simb is None and idnode.nome in parser_tascal_mepa.tabela_variaveis:
             simb = parser_tascal_mepa.tabela_variaveis[idnode.nome]
