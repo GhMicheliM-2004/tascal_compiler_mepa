@@ -44,7 +44,6 @@ class GeradorMEPA: # gerador de código MEPA
         m = 'visita_' + node.__class__.__name__
         fn = getattr(self, m, None)
         if fn is None:
-            # silently ignore unknown nodes
             return
         return fn(node)
 
