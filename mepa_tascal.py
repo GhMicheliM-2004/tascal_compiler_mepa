@@ -110,13 +110,6 @@ class GeradorMEPA: # gerador de código MEPA
         self._emite(f"DSVS {r_begin}")
         self._emite_rotulo(r_false)
 
-    def visita_Repete(self, cmd: ast.Repete): # visita comando repeat-until
-        r_begin = self._novo_rotulo()
-        self._emite_rotulo(r_begin)
-        self.visita(cmd.bloco)
-        self.visita(cmd.cond)
-        self._emite(f"DSVF {r_begin}")
-
     def visita_CalculoBinario(self, expr: ast.CalculoBinario): # visita cálculo binário
         self.visita(expr.left)
         self.visita(expr.right)
