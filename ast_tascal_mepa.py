@@ -1,9 +1,10 @@
-from __future__ import annotations
+# Arquivo para construir a AST
+from __future__ import annotations 
 from dataclasses import dataclass, field
 from typing import List, Optional, Any
 
 # Nó base
-class No:
+class No: #
     pass
 
 # Comando base
@@ -12,9 +13,7 @@ class Cmd(No):
 
 # Expressão base
 class Expr(No):
-    tipo: Optional[str] = None  # será anotado pela semântica/por inferência
-
-# ---------- Nós AST ----------
+    tipo: Optional[str] = None  # será anotado pela semântica ou por inferência
 
 @dataclass
 class Programa(No):
@@ -38,7 +37,7 @@ class Atribuicao(Cmd):
 
 @dataclass
 class Leitura(Cmd):
-    ids: List['CalcId']  # aqui mantemos CalcId para facilitar geração
+    ids: List['CalcId'] 
 
 @dataclass
 class Escrita(Cmd):
@@ -59,8 +58,6 @@ class Enquanto(Cmd):
 class Repete(Cmd):
     bloco: BlocoCmds
     cond: Expr
-
-# ---------- Expressões ----------
 
 @dataclass
 class CalculoBinario(Expr):
